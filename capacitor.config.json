@@ -1,0 +1,8 @@
+{
+  "appId": "com.goship.app",
+  "appName": "GoShip",
+  "webDir": "dist-android",
+  "server": {
+    "androidScheme": "https"
+  }
+}

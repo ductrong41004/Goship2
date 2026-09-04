@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GoShip</string>
+    <string name="title_activity_main">GoShip</string>
+    <string name="package_name">com.goship.app</string>
+    <string name="custom_url_scheme">com.goship.app</string>
+</resources>

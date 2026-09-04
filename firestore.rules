@@ -1,0 +1,123 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function myProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && myProfile().role == 'admin';
+    }
+
+    function isActiveUser() {
+      return isSignedIn() && myProfile().active != false;
+    }
+
+    // users/{uid} -- profile documents (name, role, active, email)
+    match /users/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      // Only Admin can create/update/delete employee profiles.
+      // (Admin's own profile should be created manually once via console.)
+      allow write: if isAdmin();
+    }
+
+    // config/settings -- current bill prefix + lastBillNum
+    match /config/{doc} {
+      allow read: if isSignedIn();
+      allow create, delete: if isAdmin();
+      // Admin can update anything; active employees can update lastBillNum + prefix (for rollover)
+      allow update: if isAdmin() || isActiveUser();
+    }
+
+    // bills/{billFull} -- doc id IS the full bill number, guaranteeing uniqueness
+    match /bills/{billId} {
+      allow read: if isSignedIn() && (isAdmin() || resource == null || resource.data.uid == request.auth.uid);
+      // Employees can only create a bill for themselves, and cannot create
+      // a duplicate because Firestore doc-create fails if the ID exists
+      // (Admin SDK / client enforces this in a transaction).
+      allow create: if isActiveUser()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.amount in [10000, 15000]
+        && billId == request.resource.data.billFull;
+      // Allow update if Admin OR (is active owner, status remains pending, amount is valid)
+      allow update: if isAdmin() || (
+        isActiveUser()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.amount in [10000, 15000]
+      );
+      // Allow delete if Admin OR (is owner and status is pending)
+      allow delete: if isAdmin() || (
+        isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+      );
+    }
+
+    // usernames/{username} -- mapping username -> email cho mục đích tra cứu khi đăng nhập
+    // Cho phép đọc công khai (không cần đăng nhập) để trang login có thể tra cứu
+    match /usernames/{username} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // payments/{id} -- payment run history, admin only
+    match /payments/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // commissions/{docId} -- employee daily commission records
+    match /commissions/{docId} {
+      allow read: if isSignedIn();
+      allow create, update: if isAdmin() || (isActiveUser() && docId == request.auth.uid + "_" + request.resource.data.date);
+      allow delete: if isAdmin() || (isActiveUser() && docId == request.auth.uid + "_" + resource.data.date);
+    }
+
+    // boss_debts/{id} -- boss debts tracking (Anh Hào / Anh Linh nợ nhân viên)
+    match /boss_debts/{id} {
+      allow read: if isSignedIn() && (isAdmin() || resource == null || resource.data.uid == request.auth.uid);
+      allow create: if isActiveUser()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if isAdmin() || (
+        isActiveUser()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'pending'
+      );
+      allow delete: if isAdmin() || (
+        isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+      );
+    }
+
+    // bonchon_bills/{id} -- bonchon delivery bills
+    match /bonchon_bills/{id} {
+      allow read: if isSignedIn() && (isAdmin() || resource == null || resource.data.uid == request.auth.uid);
+      allow create: if isActiveUser()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if isAdmin() || (
+        isActiveUser()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'pending'
+      );
+      allow delete: if isAdmin() || (
+        isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+      );
+    }
+  }
+}
