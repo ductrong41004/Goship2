@@ -293,9 +293,13 @@ export default function EmployeeHome() {
     } catch (err) {
       if (err.message === 'DUPLICATE') {
         setStatus({ type: 'error', text: `Bill ${code} đã tồn tại.` })
+      } else if (err.code === 'permission-denied') {
+        setStatus({ type: 'error', text: 'Lỗi quyền truy cập (permission-denied). Vui lòng báo Admin.' })
+      } else if (err.code === 'unavailable' || err.code === 'deadline-exceeded') {
+        setStatus({ type: 'error', text: 'Mất kết nối mạng. Vui lòng kiểm tra mạng và thử lại.' })
       } else {
-        console.error(err)
-        setStatus({ type: 'error', text: 'Có lỗi xảy ra, vui lòng thử lại.' })
+        console.error('Lỗi lưu bill:', err.code, err.message)
+        setStatus({ type: 'error', text: `Lỗi: ${err.code || err.message || 'Không rõ'}. Thử lại hoặc báo Admin.` })
       }
     } finally {
       setSaving(false)
