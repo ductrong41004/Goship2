@@ -17,6 +17,7 @@ import AdminBonchonWeekBills from './pages/AdminBonchonWeekBills'
 import AdminBonchonEmployees from './pages/AdminBonchonEmployees'
 import AdminBonchonEmployeeDetail from './pages/AdminBonchonEmployeeDetail'
 import AdminFeatureSettings from './pages/AdminFeatureSettings'
+import RulesPage from './pages/RulesPage'
 
 export default function App() {
   return (
@@ -77,11 +78,13 @@ function AppRoutes() {
             <Route path="/admin/boss-debts" element={<AdminBossDebts />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/settings/data" element={<AdminFeatureSettings />} />
+            <Route path="/admin/rules" element={<RulesPage />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Routes>
         ) : (
           <Routes>
             <Route path="/" element={<EmployeeHome />} />
+            <Route path="/rules" element={<RulesPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   collection, doc, onSnapshot, query, runTransaction, serverTimestamp, where, orderBy, deleteDoc, updateDoc, setDoc,
 } from 'firebase/firestore'
@@ -26,7 +26,7 @@ function getWeeksOfMonth(year, month) {
 export default function EmployeeHome() {
   const { user, profile } = useAuth()
   const [billCode, setBillCode] = useState('')
-  const [amount, setAmount] = useState(null)
+  const [amount, setAmount] = useState(15000)
   const [status, setStatus] = useState({ type: '', text: '' })
   const [saving, setSaving] = useState(false)
   const [bills, setBills] = useState([])
@@ -57,6 +57,57 @@ export default function EmployeeHome() {
   const [commCurrentRecord, setCommCurrentRecord] = useState(null) // record for selected commDate
   const [commSelectedWeek, setCommSelectedWeek] = useState('')
   const [showQR, setShowQR] = useState(false)
+  const [showRules, setShowRules] = useState(false)
+  const [rulesHtml, setRulesHtml] = useState(() => localStorage.getItem('lottee_rules_html') || '')
+  const rulesVideoRef = useRef(null)
+  const [videoUnmuted, setVideoUnmuted] = useState(false)
+
+  function isHtmlEmpty(html) {
+    if (!html) return true
+    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+    return text.length === 0
+  }
+
+  useEffect(() => {
+    const ref = doc(db, 'config', 'rules')
+    return onSnapshot(ref, (snap) => {
+      if (snap.exists()) {
+        const html = snap.data().contentHtml || ''
+        setRulesHtml(html)
+        localStorage.setItem('lottee_rules_html', html)
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (showRules && isHtmlEmpty(rulesHtml)) {
+      // Delay slightly for modal element to mount
+      const t = setTimeout(() => {
+        if (!rulesVideoRef.current) return
+        rulesVideoRef.current.currentTime = 0
+        rulesVideoRef.current.muted = false
+        const playPromise = rulesVideoRef.current.play()
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setVideoUnmuted(true)
+            })
+            .catch((err) => {
+              console.warn('Autoplay with sound prevented, falling back to muted:', err)
+              if (rulesVideoRef.current) {
+                rulesVideoRef.current.muted = true
+                rulesVideoRef.current.play()
+                setVideoUnmuted(false)
+              }
+            })
+        }
+      }, 100)
+      return () => clearTimeout(t)
+    } else if (!showRules && rulesVideoRef.current) {
+      rulesVideoRef.current.pause()
+      setVideoUnmuted(false)
+    }
+  }, [showRules, rulesHtml])
 
   // Feature flags from admin (config/features)
   const [features, setFeatures] = useState({ lottee: true, bonchon: true, bossDebt: true })
@@ -260,10 +311,6 @@ export default function EmployeeHome() {
       setShowGuideModal(true)
       return
     }
-    if (!amount) {
-      setStatus({ type: 'error', text: 'Chọn mức tiền 10.000đ hoặc 15.000đ.' })
-      return
-    }
 
     setSaving(true)
     try {
@@ -289,7 +336,7 @@ export default function EmployeeHome() {
       })
       setStatus({ type: 'success', text: `Đã lưu bill ${code}` })
       setBillCode('')
-      setAmount(null)
+      setAmount(15000)
     } catch (err) {
       if (err.message === 'DUPLICATE') {
         setStatus({ type: 'error', text: `Bill ${code} đã tồn tại.` })
@@ -473,21 +520,39 @@ export default function EmployeeHome() {
   return (
     <div className="page">
 
-      {/* Floating QR Button */}
-      <button
-        onClick={() => setShowQR(true)}
-        style={{
-          position: 'fixed', bottom: '20px', right: '20px',
-          background: 'var(--navy)', color: '#fff',
-          border: 'none', borderRadius: '50px',
-          padding: '10px 18px', fontSize: '14px', fontWeight: '700',
-          cursor: 'pointer', zIndex: 50,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-          display: 'flex', alignItems: 'center', gap: '6px',
-        }}
-      >
-        📷 Mã QR
-      </button>
+      {/* Floating Action Buttons */}
+      <div style={{
+        position: 'fixed', bottom: '20px', right: '20px',
+        display: 'flex', gap: '8px', zIndex: 50,
+      }}>
+        <button
+          onClick={() => setShowRules(true)}
+          style={{
+            background: '#fff', color: 'var(--navy)',
+            border: '2px solid var(--navy)', borderRadius: '50px',
+            padding: '10px 16px', fontSize: '13px', fontWeight: '800',
+            cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+            display: 'flex', alignItems: 'center', gap: '6px',
+          }}
+        >
+          📜 Bảng nội quy
+        </button>
+
+        <button
+          onClick={() => setShowQR(true)}
+          style={{
+            background: 'var(--navy)', color: '#fff',
+            border: 'none', borderRadius: '50px',
+            padding: '10px 16px', fontSize: '13px', fontWeight: '700',
+            cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            display: 'flex', alignItems: 'center', gap: '6px',
+          }}
+        >
+          📷 Mã QR
+        </button>
+      </div>
 
       {/* QR Modal */}
       {showQR && (
@@ -514,10 +579,24 @@ export default function EmployeeHome() {
               Quet mã để chuyển tiền
             </p>
             <img
-              src={`${import.meta.env.BASE_URL}qrgoship.png`}
+              src={`${import.meta.env.BASE_URL}qrgoship.jpg`}
               alt="QR Go Ship"
               style={{ width: '100%', borderRadius: '12px', display: 'block', marginBottom: '16px' }}
             />
+
+            <button
+              onClick={() => { setShowQR(false); setShowRules(true); }}
+              style={{
+                width: '100%', marginBottom: '14px', padding: '9px 12px',
+                borderRadius: '10px', border: '1.5px solid var(--navy)',
+                background: 'rgba(15, 61, 62, 0.05)', color: 'var(--navy)',
+                fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+              }}
+            >
+              📜 Xem Bảng nội quy GOSHIP
+            </button>
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => setShowQR(false)}
@@ -530,8 +609,8 @@ export default function EmployeeHome() {
                 Đóng
               </button>
               <a
-                href={`${import.meta.env.BASE_URL}qrgoship.png`}
-                download="qrgoship.png"
+                href={`${import.meta.env.BASE_URL}qrgoship.jpg`}
+                download="qrgoship.jpg"
                 style={{
                   flex: 2, padding: '11px', borderRadius: '12px',
                   background: 'var(--navy)', color: '#fff',
@@ -542,6 +621,128 @@ export default function EmployeeHome() {
               >
                 ⬇️ Lưu vào ảnh
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rules Modal for Employee */}
+      {showRules && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',
+            zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={() => setShowRules(false)}
+        >
+          <div
+            style={{
+              background: '#fff', borderRadius: '20px',
+              width: '100%', maxWidth: '680px', maxHeight: '90vh',
+              display: 'flex', flexDirection: 'column',
+              boxShadow: '0 12px 48px rgba(0,0,0,0.3)',
+              overflow: 'hidden',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '16px 20px', borderBottom: '1px solid var(--line)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              background: 'var(--navy)', color: '#fff',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '20px' }}>📜</span>
+                <h3 style={{ margin: 0, fontSize: '17px', fontWeight: '800', color: '#fff' }}>
+                  Bảng Nội Quy GOSHIP
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowRules(false)}
+                style={{
+                  background: 'none', border: 'none', color: '#fff',
+                  fontSize: '24px', cursor: 'pointer', lineHeight: 1, padding: 0,
+                }}
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body: Rules Content OR Video when empty */}
+            <div
+              style={{
+                padding: isHtmlEmpty(rulesHtml) ? '20px' : '28px',
+                overflowY: 'auto', flex: 1,
+                fontSize: '15px', lineHeight: '1.7', color: 'var(--ink)',
+                background: isHtmlEmpty(rulesHtml) ? '#0f172a' : '#fff',
+                textAlign: isHtmlEmpty(rulesHtml) ? 'center' : 'left',
+              }}
+            >
+              {isHtmlEmpty(rulesHtml) ? (
+                <div style={{ position: 'relative', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
+                  <video
+                    ref={rulesVideoRef}
+                    src={`${import.meta.env.BASE_URL}Onggianhay.mp4`}
+                    playsInline
+                    webkit-playsinline="true"
+                    controls
+                    autoPlay
+                    loop
+                    style={{
+                      width: '100%',
+                      maxHeight: '65vh',
+                      borderRadius: '16px',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+                      display: 'block',
+                      background: '#000',
+                    }}
+                  />
+                  {!videoUnmuted && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (rulesVideoRef.current) {
+                          rulesVideoRef.current.muted = false
+                          rulesVideoRef.current.play()
+                          setVideoUnmuted(true)
+                        }
+                      }}
+                      style={{
+                        position: 'absolute', top: '16px', right: '16px',
+                        background: 'rgba(0,0,0,0.8)', color: '#fff',
+                        border: '1.5px solid rgba(255,255,255,0.4)',
+                        borderRadius: '30px', padding: '8px 14px',
+                        fontSize: '13px', fontWeight: '700', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: '6px',
+                        backdropFilter: 'blur(6px)',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                      }}
+                    >
+                      🔊 Bật âm thanh
+                    </button>
+                  )}
+                  <p style={{ margin: '14px 0 0', color: '#94a3b8', fontSize: '14px', fontWeight: '600' }}>
+                    Học tập mà nhảy theo nha anh em
+                  </p>
+                </div>
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: rulesHtml }} />
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{
+              padding: '12px 20px', borderTop: '1px solid var(--line)',
+              background: '#f8fafc', display: 'flex', justifyContent: 'flex-end',
+            }}>
+              <button
+                className="btn-primary"
+                onClick={() => setShowRules(false)}
+                style={{ padding: '9px 24px', fontSize: '14px', borderRadius: '10px' }}
+              >
+                Đã hiểu & Đóng
+              </button>
             </div>
           </div>
         </div>
@@ -567,19 +768,8 @@ export default function EmployeeHome() {
           style={features.bonchon === false ? { opacity: 0.45, cursor: 'not-allowed', filter: 'grayscale(80%)' } : {}}
         >
           <span>BONCHON</span>
-          {features.bonchon === false ? (
+          {features.bonchon === false && (
             <span style={{ fontSize: 10, marginLeft: 5, background: '#ef4444', color: '#fff', borderRadius: 8, padding: '1px 5px', fontWeight: 700 }}>Sắp ra mắt</span>
-          ) : (
-            <span style={{
-              fontSize: '10px', fontWeight: '800', marginLeft: '6px', padding: '2px 6px',
-              borderRadius: '12px',
-              background: activeTab === 'bonchon' ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)',
-              color: activeTab === 'bonchon' ? '#78350f' : '#b45309',
-              border: activeTab === 'bonchon' ? 'none' : '1px solid rgba(245, 158, 11, 0.4)',
-              whiteSpace: 'nowrap', display: 'inline-block', verticalAlign: 'middle',
-            }}>
-              Sắp ra mắt
-            </span>
           )}
         </button>
 
@@ -648,14 +838,7 @@ export default function EmployeeHome() {
                   Bill đầy đủ: <strong>{billCode}</strong>
                 </div>
               )}
-              <div className="amount-select">
-                <button
-                  type="button"
-                  className={`amount-btn ${amount === 10000 ? 'active a10' : ''}`}
-                  onClick={() => setAmount(10000)}
-                >
-                  10.000đ
-                </button>
+              <div className="amount-select" style={{ justifyContent: 'center' }}>
                 <button
                   type="button"
                   className={`amount-btn ${amount === 15000 ? 'active a15' : ''}`}

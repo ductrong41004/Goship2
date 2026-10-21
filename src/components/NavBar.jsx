@@ -73,16 +73,7 @@ export default function NavBar() {
                   className={`drawer-group-header ${bonchonOpen ? 'open' : ''}`} 
                   onClick={() => setBonchonOpen(!bonchonOpen)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>BONCHON</span>
-                    <span style={{
-                      fontSize: '9.5px', fontWeight: '800', padding: '1px 6px',
-                      borderRadius: '10px', background: 'rgba(245, 158, 11, 0.18)',
-                      color: '#b45309', border: '1px solid rgba(245, 158, 11, 0.35)',
-                    }}>
-                      Sắp ra mắt
-                    </span>
-                  </div>
+                  <span>BONCHON</span>
                   <span className="caret" style={{ display: 'inline-block' }}>▶</span>
                 </div>
                 {bonchonOpen && (
@@ -129,15 +120,23 @@ export default function NavBar() {
                 ⚙️ Cài Đặt Dữ Liệu
               </NavLink>
 
-              {/* CÀI ĐẶT Direct Link */}
+              {/* QUẢN LÍ NHÂN VIÊN Direct Link */}
               <NavLink to="/admin/settings" className="drawer-link" style={{ marginTop: '4px' }} onClick={closeDrawer}>
-                Cài đặt
+                👥 Quản lí nhân viên
+              </NavLink>
+
+              {/* BẢNG NỘI QUY Direct Link */}
+              <NavLink to="/admin/rules" className="drawer-link" style={{ marginTop: '4px' }} onClick={closeDrawer}>
+                📜 Bảng nội quy
               </NavLink>
             </>
           ) : (
             <>
               <NavLink to="/" end className="drawer-link" onClick={closeDrawer}>
                 Thêm bill
+              </NavLink>
+              <NavLink to="/rules" className="drawer-link" style={{ marginTop: '4px' }} onClick={closeDrawer}>
+                📜 Bảng nội quy
               </NavLink>
             </>
           )}

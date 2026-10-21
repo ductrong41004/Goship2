@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { createUserWithEmailAndPassword, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth'
 import { collection, deleteDoc, doc, onSnapshot, query, setDoc, where, updateDoc } from 'firebase/firestore'
 import { db, secondaryAuth, auth } from '../firebase'
+import { POPULAR_BANKS, fetchVietQRBanks, buildVietQRUrl } from '../utils/vietqr'
 
 export default function AdminSettings() {
   const [employees, setEmployees] = useState([])
+  const [banks, setBanks] = useState(POPULAR_BANKS)
   const [form, setForm] = useState({ name: '', username: '' })
   const [creating, setCreating] = useState(false)
   const [createMsg, setCreateMsg] = useState({ type: '', text: '' })
@@ -12,6 +14,79 @@ export default function AdminSettings() {
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [pwMsg, setPwMsg] = useState({ type: '', text: '' })
+
+  const [stkModal, setStkModal] = useState({
+    open: false,
+    emp: null,
+    stk: '',
+    bankCode: 'MB',
+    bankName: 'MBBank',
+    memo: 'Goship chuyen tien thanh toan',
+    isEditing: false,
+  })
+  const [stkSaving, setStkSaving] = useState(false)
+  const [stkMsg, setStkMsg] = useState({ type: '', text: '' })
+
+  useEffect(() => {
+    fetchVietQRBanks().then((list) => {
+      if (list && list.length > 0) setBanks(list)
+    })
+  }, [])
+
+  function openStkModal(emp) {
+    setStkMsg({ type: '', text: '' })
+    setStkModal({
+      open: true,
+      emp,
+      stk: emp.stk || '',
+      bankCode: emp.bankCode || 'MB',
+      bankName: emp.bankName || 'MBBank',
+      memo: 'Goship chuyen tien thanh toan',
+      isEditing: !emp.stk,
+    })
+  }
+
+  function closeStkModal() {
+    setStkModal({ open: false, emp: null, stk: '', bankCode: 'MB', bankName: 'MBBank', memo: 'Goship chuyen tien thanh toan', isEditing: false })
+    setStkMsg({ type: '', text: '' })
+  }
+
+  async function handleSaveStk(e) {
+    e.preventDefault()
+    if (!stkModal.emp) return
+    const trimmedStk = (stkModal.stk || '').trim().replace(/\s+/g, '')
+    const selectedBank = banks.find((b) => b.code?.toUpperCase() === (stkModal.bankCode || '').toUpperCase()) || {}
+    const bankCode = (stkModal.bankCode || selectedBank.code || 'MB').toUpperCase()
+    const bankName = selectedBank.shortName || selectedBank.name || bankCode
+
+    if (!trimmedStk) {
+      setStkMsg({ type: 'error', text: 'Vui lòng nhập số tài khoản.' })
+      return
+    }
+    setStkSaving(true)
+    setStkMsg({ type: '', text: '' })
+    try {
+      await updateDoc(doc(db, 'users', stkModal.emp.uid), {
+        stk: trimmedStk,
+        bankCode,
+        bankName,
+      })
+      setStkModal((prev) => ({
+        ...prev,
+        isEditing: false,
+        stk: trimmedStk,
+        bankCode,
+        bankName,
+        emp: { ...prev.emp, stk: trimmedStk, bankCode, bankName },
+      }))
+      setStkMsg({ type: 'success', text: 'Đã lưu STK và ngân hàng thành công!' })
+    } catch (err) {
+      console.error(err)
+      setStkMsg({ type: 'error', text: 'Lưu STK thất bại. Vui lòng thử lại.' })
+    } finally {
+      setStkSaving(false)
+    }
+  }
 
   function removeVietnameseTones(str) {
     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a"); 
@@ -170,7 +245,7 @@ export default function AdminSettings() {
             <li key={emp.uid} className="bill-row">
               <span className="bill-code">{emp.name}</span>
               <span className="muted small">Đăng nhập: <strong>{emp.username || '—'}</strong></span>
-              <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <button
                   className="link-btn"
                   onClick={() => editEmployeeName(emp)}
@@ -185,6 +260,23 @@ export default function AdminSettings() {
                 >
                   Xóa nhân viên
                 </button>
+                {emp.stk ? (
+                  <button
+                    className="link-btn"
+                    onClick={() => openStkModal(emp)}
+                    style={{ color: 'var(--success)', fontWeight: 600 }}
+                  >
+                    Xem QR
+                  </button>
+                ) : (
+                  <button
+                    className="link-btn"
+                    onClick={() => openStkModal(emp)}
+                    style={{ color: '#d97706', fontWeight: 600 }}
+                  >
+                    Nhập STK
+                  </button>
+                )}
               </div>
             </li>
           ))}
@@ -235,6 +327,227 @@ export default function AdminSettings() {
           {pwSaving ? 'Đang đổi…' : 'Đổi mật khẩu'}
         </button>
       </form>
+
+      {/* ── Modal Nhập STK / Xem QR ── */}
+      {stkModal.open && stkModal.emp && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+            zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={closeStkModal}
+        >
+          <div
+            style={{
+              background: '#fff', borderRadius: '18px', padding: '24px',
+              width: '100%', maxWidth: '380px',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.25)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: 'var(--navy)' }}>
+                {stkModal.isEditing ? '💳 Nhập số tài khoản' : '📷 Mã QR Nhân Viên'}
+              </h3>
+              <button
+                onClick={closeStkModal}
+                style={{
+                  background: 'none', border: 'none', fontSize: '22px',
+                  cursor: 'pointer', color: 'var(--ink-soft)', lineHeight: 1,
+                }}
+              >
+                &times;
+              </button>
+            </div>
+
+            <p style={{ margin: '0 0 16px', fontSize: '13px', color: 'var(--ink-soft)' }}>
+              Nhân viên: <strong style={{ color: 'var(--ink)' }}>{stkModal.emp.name}</strong>
+              {stkModal.emp.username && <span> ({stkModal.emp.username})</span>}
+            </p>
+
+            {stkModal.isEditing ? (
+              <form onSubmit={handleSaveStk} className="stack" style={{ gap: '14px' }}>
+                <label className="field">
+                  <span>Ngân hàng</span>
+                  <select
+                    value={stkModal.bankCode}
+                    onChange={(e) => {
+                      const selected = banks.find((b) => b.code === e.target.value)
+                      setStkModal({
+                        ...stkModal,
+                        bankCode: e.target.value,
+                        bankName: selected?.shortName || e.target.value,
+                      })
+                    }}
+                    style={{
+                      width: '100%', padding: '11px 12px', borderRadius: '10px',
+                      border: '1.5px solid var(--line)', background: '#fff',
+                      fontSize: '14px', fontWeight: '600', color: 'var(--ink)',
+                    }}
+                  >
+                    {banks.map((b) => (
+                      <option key={b.code || b.bin} value={b.code}>
+                        {b.shortName || b.code} — {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="field">
+                  <span>Số tài khoản (STK)</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={stkModal.stk}
+                    onChange={(e) => setStkModal({ ...stkModal, stk: e.target.value.replace(/\s+/g, '') })}
+                    placeholder="Nhập STK ngân hàng..."
+                    required
+                    autoFocus
+                  />
+                </label>
+
+                {stkMsg.text && (
+                  <div className={stkMsg.type === 'error' ? 'error-text' : 'success-text'} style={{ fontSize: '13px' }}>
+                    {stkMsg.text}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (stkModal.emp.stk) {
+                        setStkModal((prev) => ({ ...prev, isEditing: false }))
+                      } else {
+                        closeStkModal()
+                      }
+                    }}
+                    style={{
+                      flex: 1, padding: '11px', borderRadius: '10px',
+                      border: '1.5px solid var(--line)', background: 'var(--paper)',
+                      fontWeight: '600', fontSize: '14px', cursor: 'pointer',
+                    }}
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    disabled={stkSaving}
+                    style={{ flex: 1.5, padding: '11px' }}
+                  >
+                    {stkSaving ? 'Đang lưu…' : 'Lưu & Tạo QR'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div>
+                {/* Thông tin STK */}
+                <div style={{
+                  background: '#f8fafc', padding: '14px', borderRadius: '12px',
+                  border: '1px solid var(--line)', marginBottom: '16px',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '12px', color: 'var(--ink-soft)', marginBottom: '2px' }}>
+                      Ngân hàng: <strong style={{ color: 'var(--ink)' }}>{stkModal.bankName || stkModal.bankCode}</strong>
+                    </div>
+                    <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--navy)', letterSpacing: '0.5px' }}>
+                      {stkModal.stk}
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--ink-soft)', marginTop: '2px' }}>
+                      Chủ TK: <strong style={{ color: 'var(--ink)' }}>{stkModal.emp.name}</strong>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(stkModal.stk)
+                      alert(`Đã copy số tài khoản: ${stkModal.stk}`)
+                    }}
+                    style={{
+                      padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--line)',
+                      background: '#fff', fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+                    }}
+                  >
+                    📋 Copy STK
+                  </button>
+                </div>
+
+                {/* Cú pháp nội dung chuyển khoản */}
+                <label className="field" style={{ marginBottom: '14px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--navy)' }}>
+                    📝 Nội dung chuyển khoản:
+                  </span>
+                  <input
+                    type="text"
+                    value={stkModal.memo}
+                    onChange={(e) => setStkModal({ ...stkModal, memo: e.target.value })}
+                    placeholder="Goship chuyen tien thanh toan"
+                    style={{
+                      padding: '9px 12px', borderRadius: '10px',
+                      border: '1.5px solid var(--line)', fontSize: '13px',
+                      background: '#fff', fontWeight: '500',
+                    }}
+                  />
+                </label>
+
+                {/* VietQR Image Container */}
+                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                  <div style={{
+                    background: '#fff', padding: '8px', borderRadius: '16px',
+                    border: '1.5px solid var(--line)', display: 'inline-block',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)', width: '100%',
+                    maxWidth: '300px', boxSizing: 'border-box',
+                  }}>
+                    <img
+                      src={buildVietQRUrl({
+                        bankCode: stkModal.bankCode || 'MB',
+                        stk: stkModal.stk,
+                        accountName: stkModal.emp.name,
+                        addInfo: stkModal.memo || '',
+                        template: 'compact',
+                      })}
+                      alt="VietQR Code"
+                      style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '10px' }}
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+
+                {stkMsg.text && (
+                  <div className={stkMsg.type === 'error' ? 'error-text' : 'success-text'} style={{ fontSize: '13px', marginBottom: '12px' }}>
+                    {stkMsg.text}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setStkModal((prev) => ({ ...prev, isEditing: true }))}
+                    style={{
+                      flex: 1, padding: '11px', borderRadius: '10px',
+                      border: '1.5px solid var(--line)', background: 'var(--paper)',
+                      color: 'var(--navy)', fontWeight: '700', fontSize: '14px', cursor: 'pointer',
+                    }}
+                  >
+                    ✏️ Sửa STK
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeStkModal}
+                    className="btn-primary"
+                    style={{ flex: 1, padding: '11px' }}
+                  >
+                    Đóng
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
