@@ -17,6 +17,7 @@ import AdminBonchonWeekBills from './pages/AdminBonchonWeekBills'
 import AdminBonchonEmployees from './pages/AdminBonchonEmployees'
 import AdminBonchonEmployeeDetail from './pages/AdminBonchonEmployeeDetail'
 import AdminFeatureSettings from './pages/AdminFeatureSettings'
+import AdminEmployeeDeposits from './pages/AdminEmployeeDeposits'
 import RulesPage from './pages/RulesPage'
 
 export default function App() {
@@ -78,6 +79,7 @@ function AppRoutes() {
             <Route path="/admin/boss-debts" element={<AdminBossDebts />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/settings/data" element={<AdminFeatureSettings />} />
+            <Route path="/admin/deposits" element={<AdminEmployeeDeposits />} />
             <Route path="/admin/rules" element={<RulesPage />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Routes>

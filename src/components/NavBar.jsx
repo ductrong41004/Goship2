@@ -125,6 +125,11 @@ export default function NavBar() {
                 👥 Quản lí nhân viên
               </NavLink>
 
+              {/* QUẢN LÍ TIỀN CỌC NV Direct Link */}
+              <NavLink to="/admin/deposits" className="drawer-link" style={{ marginTop: '4px' }} onClick={closeDrawer}>
+                🎒 Quản lí tiền cọc NV
+              </NavLink>
+
               {/* BẢNG NỘI QUY Direct Link */}
               <NavLink to="/admin/rules" className="drawer-link" style={{ marginTop: '4px' }} onClick={closeDrawer}>
                 📜 Bảng nội quy

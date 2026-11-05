@@ -312,6 +312,7 @@ export default function EmployeeHome() {
       return
     }
 
+    const saveAmount = amount === 10000 ? 10000 : 15000
     setSaving(true)
     try {
       await runTransaction(db, async (tx) => {
@@ -323,7 +324,7 @@ export default function EmployeeHome() {
           billFull: code,
           uid: user.uid,
           employeeName: profile?.name || user.email,
-          amount,
+          amount: saveAmount,
           status: 'pending',
           dateStr: formatDateStr(now),
           timeStr: formatTimeStr(now),
@@ -336,7 +337,7 @@ export default function EmployeeHome() {
       })
       setStatus({ type: 'success', text: `Đã lưu bill ${code}` })
       setBillCode('')
-      setAmount(15000)
+      setAmount(saveAmount)
     } catch (err) {
       if (err.message === 'DUPLICATE') {
         setStatus({ type: 'error', text: `Bill ${code} đã tồn tại.` })
@@ -838,7 +839,14 @@ export default function EmployeeHome() {
                   Bill đầy đủ: <strong>{billCode}</strong>
                 </div>
               )}
-              <div className="amount-select" style={{ justifyContent: 'center' }}>
+              <div className="amount-select">
+                <button
+                  type="button"
+                  className={`amount-btn ${amount === 10000 ? 'active a10' : ''}`}
+                  onClick={() => setAmount(10000)}
+                >
+                  10.000đ
+                </button>
                 <button
                   type="button"
                   className={`amount-btn ${amount === 15000 ? 'active a15' : ''}`}

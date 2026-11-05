@@ -423,6 +423,7 @@ main {
 }
 
 .amount-btn {
+  flex: 1;
   padding: 18px 10px;
   border-radius: 12px;
   border: 2px solid var(--line);
