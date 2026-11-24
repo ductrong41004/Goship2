@@ -299,7 +299,7 @@ export default function AdminCommissionEnter() {
                 style={{ flex: 1, opacity: (isPenalty || isDucTrong) ? 0.6 : 1 }}
               />
               {isDucTrong ? (
-                <span style={{ fontSize: '13px', color: 'var(--navy)', fontWeight: '700', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid var(--navy)', background: 'rgba(27,35,80,0.08)' }}>
+                <span style={{ fontSize: '13px', color: '#38bdf8', fontWeight: '700', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid rgba(56, 189, 248, 0.4)', background: 'rgba(37, 99, 235, 0.15)' }}>
                   Boi hàn quốc cố định 15%
                 </span>
               ) : (
@@ -310,11 +310,12 @@ export default function AdminCommissionEnter() {
                     disabled={isPenalty}
                     style={{
                       padding: '10px 18px', borderRadius: '10px', border: '1.5px solid',
-                      borderColor: isPenalty ? 'var(--line)' : (rate === String(r) ? 'var(--navy)' : 'var(--line)'),
-                      background: isPenalty ? 'var(--paper)' : (rate === String(r) ? 'var(--navy)' : 'var(--paper)'),
-                      color: isPenalty ? 'var(--ink-soft)' : (rate === String(r) ? '#ffffff' : 'var(--ink-soft)'),
-                      fontWeight: '700', cursor: isPenalty ? 'not-allowed' : 'pointer', fontSize: '13px',
+                      borderColor: isPenalty ? 'var(--line)' : (rate === String(r) ? '#38bdf8' : 'rgba(59, 130, 246, 0.25)'),
+                      background: isPenalty ? 'rgba(11, 20, 46, 0.5)' : (rate === String(r) ? 'linear-gradient(180deg, #2563eb, #1d4ed8)' : 'rgba(11, 20, 46, 0.75)'),
+                      color: isPenalty ? 'var(--ink-soft)' : (rate === String(r) ? '#ffffff' : '#94a3b8'),
+                      fontWeight: '800', cursor: isPenalty ? 'not-allowed' : 'pointer', fontSize: '13px',
                       opacity: isPenalty ? 0.6 : 1,
+                      boxShadow: rate === String(r) ? '0 3px 10px rgba(37, 99, 235, 0.4)' : 'none',
                     }}
                   >{r}%</button>
                 ))

@@ -820,16 +820,28 @@ export default function EmployeeHome() {
                     <button
                       key={boss}
                       type="button"
-                      className={`amount-btn ${selectedBoss === boss ? 'active a10' : ''}`}
+                      className={`amount-btn ${selectedBoss === boss ? 'active' : ''}`}
                       onClick={() => setSelectedBoss(boss)}
                       style={{
                         padding: '14px 10px',
                         flex: 1,
-                        borderColor: selectedBoss === boss ? 'var(--navy)' : 'var(--line)',
-                        background: selectedBoss === boss ? 'rgba(27,35,80,0.08)' : 'var(--paper-raised)',
-                        color: selectedBoss === boss ? 'var(--navy)' : 'var(--ink)',
-                        fontWeight: '700',
-                        cursor: 'pointer'
+                        fontSize: '15px',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        transition: 'all 0.16s ease',
+                        ...(selectedBoss === boss ? {
+                          background: 'linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%)',
+                          color: '#ffffff',
+                          borderColor: '#38bdf8',
+                          boxShadow: '0 4px 14px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
+                          transform: 'translateY(-1px)',
+                        } : {
+                          background: 'rgba(11, 20, 46, 0.75)',
+                          color: '#94a3b8',
+                          borderColor: 'rgba(59, 130, 246, 0.25)',
+                          boxShadow: 'none',
+                          transform: 'none',
+                        })
                       }}
                     >
                       {boss}
@@ -1084,7 +1096,7 @@ export default function EmployeeHome() {
                     style={{ flex: 1, opacity: (commIsPenalty || isDucTrong) ? 0.6 : 1 }}
                   />
                   {isDucTrong ? (
-                    <span style={{ fontSize: '13px', color: 'var(--navy)', fontWeight: '700', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid var(--navy)', background: 'rgba(27,35,80,0.08)' }}>
+                    <span style={{ fontSize: '13px', color: '#38bdf8', fontWeight: '700', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid rgba(56, 189, 248, 0.4)', background: 'rgba(37, 99, 235, 0.15)' }}>
                       Boi hàn quốc cố định 15%
                     </span>
                   ) : (
@@ -1095,11 +1107,12 @@ export default function EmployeeHome() {
                         disabled={commIsPenalty}
                         style={{
                           padding: '10px 18px', borderRadius: '10px', border: '1.5px solid',
-                          borderColor: commIsPenalty ? 'var(--line)' : (commRate === String(r) ? 'var(--navy)' : 'var(--line)'),
-                          background: commIsPenalty ? 'var(--paper)' : (commRate === String(r) ? 'var(--navy)' : 'var(--paper)'),
-                          color: commIsPenalty ? 'var(--ink-soft)' : (commRate === String(r) ? '#ffffff' : 'var(--ink-soft)'),
-                          fontWeight: '700', cursor: commIsPenalty ? 'not-allowed' : 'pointer', fontSize: '13px',
+                          borderColor: commIsPenalty ? 'var(--line)' : (commRate === String(r) ? '#38bdf8' : 'rgba(59, 130, 246, 0.25)'),
+                          background: commIsPenalty ? 'rgba(11, 20, 46, 0.5)' : (commRate === String(r) ? 'linear-gradient(180deg, #2563eb, #1d4ed8)' : 'rgba(11, 20, 46, 0.75)'),
+                          color: commIsPenalty ? 'var(--ink-soft)' : (commRate === String(r) ? '#ffffff' : '#94a3b8'),
+                          fontWeight: '800', cursor: commIsPenalty ? 'not-allowed' : 'pointer', fontSize: '13px',
                           opacity: commIsPenalty ? 0.6 : 1,
+                          boxShadow: commRate === String(r) ? '0 3px 10px rgba(37, 99, 235, 0.4)' : 'none',
                         }}
                       >{r}%</button>
                     ))
