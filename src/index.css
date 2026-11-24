@@ -1172,36 +1172,57 @@ main {
 }
 
 /* Force high contrast & vibrant styling inside rules paper */
-.rules-paper h1, .rules-paper [style*="#1e3a8a"], .rules-paper [style*="color: rgb(30, 58, 138)"] {
+.rules-paper h1, 
+.rules-paper h1 * {
   color: #38bdf8 !important;
   font-size: 24px !important;
   font-weight: 800 !important;
-  text-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+  text-shadow: 0 0 16px rgba(56, 189, 248, 0.4) !important;
   margin-bottom: 10px !important;
-  text-align: center;
+  text-align: center !important;
 }
 
 .rules-paper h2, 
-.rules-paper [style*="#0f172a"], 
-.rules-paper [style*="color: rgb(15, 23, 42)"], 
-.rules-paper [style*="color: #000"], 
-.rules-paper [style*="color: black"],
-.rules-paper [style*="color:#000"],
-.rules-paper [style*="color:#0f172a"] {
+.rules-paper h2 * {
   color: #60a5fa !important;
-  font-size: 17.5px !important;
-  font-weight: 800 !important;
-  border-bottom: 1.5px solid rgba(59, 130, 246, 0.35) !important;
-  padding-bottom: 8px !important;
-  margin-top: 26px !important;
-  margin-bottom: 12px !important;
-  display: block;
+  border-bottom-color: rgba(59, 130, 246, 0.4) !important;
 }
 
-.rules-paper h3 {
+.rules-paper h2 {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.4) !important;
+  padding-bottom: 8px !important;
+  margin-top: 26px !important;
+  margin-bottom: 14px !important;
+  display: block !important;
+}
+
+.rules-paper h3, 
+.rules-paper h3 * {
   color: #93c5fd !important;
-  font-size: 15.5px !important;
+  font-size: 16px !important;
   font-weight: 700 !important;
+}
+
+.rules-paper h4, 
+.rules-paper h4 * {
+  color: #bfdbfe !important;
+}
+
+/* Match ANY element or descendant with dark inline color or font tag */
+.rules-paper [style*="#0f172a"], .rules-paper [style*="#0f172a"] *,
+.rules-paper [style*="#1e3a8a"], .rules-paper [style*="#1e3a8a"] *,
+.rules-paper [style*="#000"], .rules-paper [style*="#000"] *,
+.rules-paper [style*="black"], .rules-paper [style*="black"] *,
+.rules-paper [style*="rgb(15"], .rules-paper [style*="rgb(15"] *,
+.rules-paper [style*="rgb(30"], .rules-paper [style*="rgb(30"] *,
+.rules-paper [style*="rgb(0"], .rules-paper [style*="rgb(0"] *,
+.rules-paper [style*="rgb(100"], .rules-paper [style*="rgb(100"] *,
+.rules-paper font[color*="#0"], .rules-paper font[color*="#0"] *,
+.rules-paper font[color="black"], .rules-paper font[color="black"] *,
+.rules-paper font {
+  color: #60a5fa !important;
 }
 
 .rules-paper p, .rules-paper li {
@@ -1224,6 +1245,6 @@ main {
 }
 
 .rules-paper li::marker {
-  color: #38bdf8;
+  color: #38bdf8 !important;
   font-size: 1.1em;
 }

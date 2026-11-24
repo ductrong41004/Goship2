@@ -68,13 +68,77 @@ const DEFAULT_RULES_HTML = `
   </ul>
 `
 
+function sanitizeRulesDOM(container) {
+  if (!container) return
+
+  // 1. All headings h1-h6
+  const headings = container.querySelectorAll('h1, h2, h3, h4, h5, h6')
+  headings.forEach((h) => {
+    if (h.tagName === 'H1') {
+      h.style.color = '#38bdf8'
+      h.style.textShadow = '0 0 16px rgba(56, 189, 248, 0.4)'
+      h.style.textAlign = 'center'
+    } else {
+      h.style.color = '#60a5fa'
+      h.style.borderBottom = '2px solid rgba(59, 130, 246, 0.4)'
+      h.style.paddingBottom = '8px'
+      h.style.marginTop = '26px'
+      h.style.marginBottom = '14px'
+    }
+    // All children of headings (font, span, b, strong, etc.)
+    h.querySelectorAll('*').forEach((child) => {
+      child.style.color = h.tagName === 'H1' ? '#38bdf8' : '#60a5fa'
+      if (child.tagName === 'FONT') child.removeAttribute('color')
+    })
+  })
+
+  // 2. All font tags everywhere in container
+  container.querySelectorAll('font').forEach((f) => {
+    f.removeAttribute('color')
+    if (f.closest('h1, h2, h3, h4')) {
+      f.style.color = '#60a5fa'
+    } else {
+      f.style.color = '#f1f5f9'
+    }
+  })
+
+  // 3. Catch all elements with dark colors
+  container.querySelectorAll('*').forEach((el) => {
+    const s = el.getAttribute('style') || ''
+    if (/color:\s*(rgb\(\s*(15|30|0|100|33|47|16)\b|#(000000|000|0f172a|1e3a8a|1e293b|334155|64748b|black)\b)/i.test(s)) {
+      if (el.tagName === 'H1' || el.closest('h1')) {
+        el.style.color = '#38bdf8'
+      } else if (['H2', 'H3', 'H4'].includes(el.tagName) || el.closest('h2, h3, h4')) {
+        el.style.color = '#60a5fa'
+      } else if (el.tagName === 'EM') {
+        el.style.color = '#94a3b8'
+      } else {
+        el.style.color = '#f1f5f9'
+      }
+    }
+
+    if (s.includes('#e2e8f0') || s.includes('rgb(226, 232, 240)')) {
+      el.style.borderBottomColor = 'rgba(59, 130, 246, 0.4)'
+    }
+  })
+}
+
 function modernizeRulesHtml(html) {
   if (!html) return html
   return html
-    .replace(/#1e3a8a/gi, '#38bdf8')
+    .replace(/rgb\(\s*15\s*,\s*23\s*,\s*42\s*\)/gi, '#60a5fa')
     .replace(/#0f172a/gi, '#60a5fa')
+    .replace(/rgb\(\s*30\s*,\s*58\s*,\s*138\s*\)/gi, '#38bdf8')
+    .replace(/#1e3a8a/gi, '#38bdf8')
+    .replace(/rgb\(\s*100\s*,\s*116\s*,\s*139\s*\)/gi, '#94a3b8')
     .replace(/#64748b/gi, '#94a3b8')
-    .replace(/#e2e8f0/gi, 'rgba(59, 130, 246, 0.3)')
+    .replace(/rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)/gi, '#60a5fa')
+    .replace(/#000000/gi, '#60a5fa')
+    .replace(/#000/gi, '#60a5fa')
+    .replace(/color=[\"']#(000000|0f172a|1e3a8a|000)[\"']/gi, 'color="#60a5fa"')
+    .replace(/color=[\"']black[\"']/gi, 'color="#60a5fa"')
+    .replace(/#e2e8f0/gi, 'rgba(59, 130, 246, 0.4)')
+    .replace(/rgb\(\s*226\s*,\s*232\s*,\s*240\s*\)/gi, 'rgba(59, 130, 246, 0.4)')
 }
 
 export default function RulesPage() {
@@ -96,6 +160,7 @@ export default function RulesPage() {
     const cached = localStorage.getItem('lottee_rules_html')
     if (editorRef.current) {
       editorRef.current.innerHTML = modernizeRulesHtml(cached || DEFAULT_RULES_HTML)
+      sanitizeRulesDOM(editorRef.current)
     }
 
     async function loadRules() {
@@ -105,6 +170,7 @@ export default function RulesPage() {
           const html = modernizeRulesHtml(snap.data().contentHtml)
           if (editorRef.current) {
             editorRef.current.innerHTML = html
+            sanitizeRulesDOM(editorRef.current)
           }
           localStorage.setItem('lottee_rules_html', html)
           if (snap.data().updatedAt) {
@@ -112,6 +178,7 @@ export default function RulesPage() {
           }
         } else if (!cached && editorRef.current) {
           editorRef.current.innerHTML = DEFAULT_RULES_HTML
+          sanitizeRulesDOM(editorRef.current)
         }
       } catch (err) {
         console.error('Lỗi tải bảng nội quy từ Firestore:', err)

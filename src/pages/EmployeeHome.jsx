@@ -23,6 +23,24 @@ function getWeeksOfMonth(year, month) {
   return result.sort((a, b) => b.week - a.week)
 }
 
+function modernizeRulesHtml(html) {
+  if (!html) return html
+  return html
+    .replace(/rgb\(\s*15\s*,\s*23\s*,\s*42\s*\)/gi, '#60a5fa')
+    .replace(/#0f172a/gi, '#60a5fa')
+    .replace(/rgb\(\s*30\s*,\s*58\s*,\s*138\s*\)/gi, '#38bdf8')
+    .replace(/#1e3a8a/gi, '#38bdf8')
+    .replace(/rgb\(\s*100\s*,\s*116\s*,\s*139\s*\)/gi, '#94a3b8')
+    .replace(/#64748b/gi, '#94a3b8')
+    .replace(/rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)/gi, '#60a5fa')
+    .replace(/#000000/gi, '#60a5fa')
+    .replace(/#000/gi, '#60a5fa')
+    .replace(/color=[\"']#(000000|0f172a|1e3a8a|000)[\"']/gi, 'color="#60a5fa"')
+    .replace(/color=[\"']black[\"']/gi, 'color="#60a5fa"')
+    .replace(/#e2e8f0/gi, 'rgba(59, 130, 246, 0.4)')
+    .replace(/rgb\(\s*226\s*,\s*232\s*,\s*240\s*\)/gi, 'rgba(59, 130, 246, 0.4)')
+}
+
 export default function EmployeeHome() {
   const { user, profile } = useAuth()
   const [billCode, setBillCode] = useState('')
@@ -58,7 +76,7 @@ export default function EmployeeHome() {
   const [commSelectedWeek, setCommSelectedWeek] = useState('')
   const [showQR, setShowQR] = useState(false)
   const [showRules, setShowRules] = useState(false)
-  const [rulesHtml, setRulesHtml] = useState(() => localStorage.getItem('lottee_rules_html') || '')
+  const [rulesHtml, setRulesHtml] = useState(() => modernizeRulesHtml(localStorage.getItem('lottee_rules_html') || ''))
   const rulesVideoRef = useRef(null)
   const [videoUnmuted, setVideoUnmuted] = useState(false)
 
@@ -72,7 +90,7 @@ export default function EmployeeHome() {
     const ref = doc(db, col('config'), 'rules')
     return onSnapshot(ref, (snap) => {
       if (snap.exists()) {
-        const html = snap.data().contentHtml || ''
+        const html = modernizeRulesHtml(snap.data().contentHtml || '')
         setRulesHtml(html)
         localStorage.setItem('lottee_rules_html', html)
       }
