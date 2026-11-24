@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, deleteDoc, doc, onSnapshot, query, where, updateDoc } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { getISOWeek, getWeekDateRange, formatMoney } from '../utils/date'
 import * as XLSX from 'xlsx'
 
@@ -29,7 +29,7 @@ export default function AdminBonchonWeekBills() {
   // Load all Bonchon bills this week
   useEffect(() => {
     const q = query(
-      collection(db, 'bonchon_bills'),
+      collection(db, col('bonchon_bills')),
       where('week', '==', week),
       where('year', '==', year)
     )
@@ -80,7 +80,7 @@ export default function AdminBonchonWeekBills() {
   async function handleToggleStatus(bill) {
     const newStatus = bill.status === 'paid' ? 'pending' : 'paid'
     try {
-      await updateDoc(doc(db, 'bonchon_bills', bill.id), { status: newStatus })
+      await updateDoc(doc(db, col('bonchon_bills'), bill.id), { status: newStatus })
     } catch (err) {
       console.error(err)
       alert('Không thể cập nhật trạng thái. Vui lòng thử lại.')
@@ -90,7 +90,7 @@ export default function AdminBonchonWeekBills() {
   async function handleDeleteBill(bill) {
     if (!confirm(`Bạn có chắc chắn muốn xóa đơn Bonchon "${bill.address || ''}" của "${bill.employeeName || 'này'}" không?`)) return
     try {
-      await deleteDoc(doc(db, 'bonchon_bills', bill.id))
+      await deleteDoc(doc(db, col('bonchon_bills'), bill.id))
     } catch (err) {
       console.error(err)
       alert('Xóa đơn thất bại. Vui lòng thử lại.')

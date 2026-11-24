@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, deleteDoc, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { formatMoney } from '../utils/date'
 
 function pad(n) {
@@ -32,7 +32,7 @@ export default function AdminCommissionHistory() {
 
   // Load employees
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     return onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }))
       list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'))
@@ -43,7 +43,7 @@ export default function AdminCommissionHistory() {
   async function handleToggleTransfer(item) {
     const isTransferred = item.status === 'transferred'
     try {
-      await updateDoc(doc(db, 'commissions', item.id), {
+      await updateDoc(doc(db, col('commissions'), item.id), {
         status: isTransferred ? 'pending' : 'transferred'
       })
     } catch (err) {
@@ -55,7 +55,7 @@ export default function AdminCommissionHistory() {
   async function handleDeleteCommission(item) {
     if (!confirm(`Xóa bản ghi hoa hồng của "${item.employeeName}"?`)) return
     try {
-      await deleteDoc(doc(db, 'commissions', item.id))
+      await deleteDoc(doc(db, col('commissions'), item.id))
     } catch (err) {
       console.error(err)
       alert('Xóa thất bại. Vui lòng thử lại.')
@@ -65,7 +65,7 @@ export default function AdminCommissionHistory() {
   // Load commission records for selected month
   useEffect(() => {
     const q = query(
-      collection(db, 'commissions'),
+      collection(db, col('commissions')),
       where('yearMonth', '==', yearMonth)
     )
     return onSnapshot(q, (snap) => {

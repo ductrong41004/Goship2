@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { doc, updateDoc, writeBatch } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { getISOWeek, formatMoney, getWeekDateRange } from '../utils/date'
 import { useBonchonWeekBills } from '../utils/useWeekBills'
 
@@ -42,7 +42,7 @@ export default function AdminBonchonEmployeeDetail() {
   async function handleToggleStatus(bill) {
     const newStatus = bill.status === 'paid' ? 'pending' : 'paid'
     try {
-      await updateDoc(doc(db, 'bonchon_bills', bill.id), { status: newStatus })
+      await updateDoc(doc(db, col('bonchon_bills'), bill.id), { status: newStatus })
     } catch (err) {
       console.error(err)
       alert('Không thể cập nhật trạng thái.')
@@ -56,7 +56,7 @@ export default function AdminBonchonEmployeeDetail() {
     try {
       const batch = writeBatch(db)
       unpaid.forEach((b) => {
-        batch.update(doc(db, 'bonchon_bills', b.id), { status: 'paid' })
+        batch.update(doc(db, col('bonchon_bills'), b.id), { status: 'paid' })
       })
       await batch.commit()
     } catch (err) {

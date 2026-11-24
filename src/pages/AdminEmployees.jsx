@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, doc, onSnapshot, query, where, writeBatch } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { getISOWeek, formatMoney, recentWeeks, getWeekDateRange } from '../utils/date'
 import { useWeekBills } from '../utils/useWeekBills'
 
@@ -38,7 +38,7 @@ export default function AdminEmployees() {
     try {
       const batch = writeBatch(db)
       unpaidBills.forEach((b) => {
-        const ref = doc(db, 'bills', b.id)
+        const ref = doc(db, col('bills'), b.id)
         batch.update(ref, { status: 'paid' })
       })
       await batch.commit()
@@ -49,7 +49,7 @@ export default function AdminEmployees() {
   }
 
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     return onSnapshot(q, (snap) => {
       setEmployees(snap.docs.map((d) => ({ uid: d.id, ...d.data() })))
     })

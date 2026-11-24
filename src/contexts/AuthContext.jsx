@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { onAuthStateChanged, signOut as fbSignOut, signInWithEmailAndPassword } from 'firebase/auth'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { auth, db } from '../firebase'
+import { auth, db, col } from '../firebase'
 
 const AuthContext = createContext(null)
 
@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!firebaseUser) return
     setProfileLoading(true)
-    const ref = doc(db, 'users', firebaseUser.uid)
+    const ref = doc(db, col('users'), firebaseUser.uid)
     const unsub = onSnapshot(ref, (snap) => {
       setProfile(snap.exists() ? snap.data() : null)
       setProfileLoading(false)

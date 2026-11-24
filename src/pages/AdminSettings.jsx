@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createUserWithEmailAndPassword, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth'
 import { collection, deleteDoc, doc, onSnapshot, query, setDoc, where, updateDoc } from 'firebase/firestore'
-import { db, secondaryAuth, auth } from '../firebase'
+import { db, secondaryAuth, auth, col, BRANCH_PREFIX } from '../firebase'
 import { POPULAR_BANKS, fetchVietQRBanks, buildVietQRUrl } from '../utils/vietqr'
 
 export default function AdminSettings() {
@@ -66,7 +66,7 @@ export default function AdminSettings() {
     setStkSaving(true)
     setStkMsg({ type: '', text: '' })
     try {
-      await updateDoc(doc(db, 'users', stkModal.emp.uid), {
+      await updateDoc(doc(db, col('users'), stkModal.emp.uid), {
         stk: trimmedStk,
         bankCode,
         bankName,
@@ -109,7 +109,7 @@ export default function AdminSettings() {
   }
 
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     return onSnapshot(q, (snap) => {
       setEmployees(snap.docs.map((d) => ({ uid: d.id, ...d.data() })))
     })
@@ -131,11 +131,11 @@ export default function AdminSettings() {
     setCreating(true)
     try {
       const randomStr = Math.random().toString(36).substring(2, 6)
-      const generatedEmail = `${usernameTrimmed}_${randomStr}@lottee.internal`
+      const generatedEmail = `${usernameTrimmed}_${BRANCH_PREFIX || ''}${randomStr}@lottee.internal`
       const defaultPassword = '123456'
 
       const cred = await createUserWithEmailAndPassword(secondaryAuth, generatedEmail, defaultPassword)
-      await setDoc(doc(db, 'users', cred.user.uid), {
+      await setDoc(doc(db, col('users'), cred.user.uid), {
         name: nameTrimmed,
         username: usernameTrimmed,
         email: generatedEmail,
@@ -143,7 +143,7 @@ export default function AdminSettings() {
         active: true,
       })
       // Lưu mapping username -> email vào collection usernames để tra cứu khi đăng nhập
-      await setDoc(doc(db, 'usernames', usernameTrimmed), {
+      await setDoc(doc(db, col('usernames'), usernameTrimmed), {
         email: generatedEmail,
         uid: cred.user.uid,
       })
@@ -160,9 +160,9 @@ export default function AdminSettings() {
   async function deleteEmployee(emp) {
     if (!confirm(`Xóa nhân viên "${emp.name}"? Tài khoản sẽ bị xóa khỏi danh sách và không thể đăng nhập. Hành động này không thể hoàn tác!`)) return
     try {
-      await deleteDoc(doc(db, 'users', emp.uid))
+      await deleteDoc(doc(db, col('users'), emp.uid))
       if (emp.username) {
-        await deleteDoc(doc(db, 'usernames', emp.username))
+        await deleteDoc(doc(db, col('usernames'), emp.username))
       }
     } catch (err) {
       console.error(err)
@@ -180,7 +180,7 @@ export default function AdminSettings() {
     }
     if (trimmed === emp.name) return
     try {
-      await updateDoc(doc(db, 'users', emp.uid), { name: trimmed })
+      await updateDoc(doc(db, col('users'), emp.uid), { name: trimmed })
     } catch (err) {
       console.error(err)
       alert('Đổi tên thất bại. Vui lòng thử lại.')

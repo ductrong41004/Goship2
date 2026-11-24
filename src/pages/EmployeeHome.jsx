@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   collection, doc, onSnapshot, query, runTransaction, serverTimestamp, where, orderBy, deleteDoc, updateDoc, setDoc,
 } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { getISOWeek, formatDateStr, formatTimeStr, formatMonthStr, formatMoney, getWeekDateRange, recentWeeks } from '../utils/date'
 import DatePickerDMY from '../components/DatePickerDMY'
@@ -48,7 +48,7 @@ export default function EmployeeHome() {
 
   const [commDate, setCommDate] = useState(formatDateStr())
   const [commRevenueInput, setCommRevenueInput] = useState('')
-  const [commRate, setCommRate] = useState('15')
+  const [commRate, setCommRate] = useState('10')
   const [commNote, setCommNote] = useState('')
   const [commIsPenalty, setCommIsPenalty] = useState(false)
   const [savingComm, setSavingComm] = useState(false)
@@ -69,7 +69,7 @@ export default function EmployeeHome() {
   }
 
   useEffect(() => {
-    const ref = doc(db, 'config', 'rules')
+    const ref = doc(db, col('config'), 'rules')
     return onSnapshot(ref, (snap) => {
       if (snap.exists()) {
         const html = snap.data().contentHtml || ''
@@ -112,7 +112,7 @@ export default function EmployeeHome() {
   // Feature flags from admin (config/features)
   const [features, setFeatures] = useState({ lottee: true, bonchon: true, bossDebt: true })
   useEffect(() => {
-    const ref = doc(db, 'config', 'features')
+    const ref = doc(db, col('config'), 'features')
     return onSnapshot(ref, (snap) => {
       if (snap.exists()) setFeatures(snap.data())
     })
@@ -173,7 +173,7 @@ export default function EmployeeHome() {
   useEffect(() => {
     if (!user) return
     const q = query(
-      collection(db, 'bills'),
+      collection(db, col('bills')),
       where('uid', '==', user.uid),
       where('week', '==', selectedWeek),
       where('year', '==', selectedYear),
@@ -188,7 +188,7 @@ export default function EmployeeHome() {
   useEffect(() => {
     if (!user) return
     const q = query(
-      collection(db, 'boss_debts'),
+      collection(db, col('boss_debts')),
       where('uid', '==', user.uid),
       where('week', '==', selectedWeek),
       where('year', '==', selectedYear)
@@ -208,7 +208,7 @@ export default function EmployeeHome() {
   useEffect(() => {
     if (!user) return
     const q = query(
-      collection(db, 'bonchon_bills'),
+      collection(db, col('bonchon_bills')),
       where('uid', '==', user.uid),
       where('week', '==', selectedWeek),
       where('year', '==', selectedYear)
@@ -228,7 +228,7 @@ export default function EmployeeHome() {
   useEffect(() => {
     if (!user) return
     const q = query(
-      collection(db, 'commissions'),
+      collection(db, col('commissions')),
       where('uid', '==', user.uid),
       where('yearMonth', '==', selectedMonthStr)
     )
@@ -242,7 +242,7 @@ export default function EmployeeHome() {
   // Watch the specific doc for the currently selected commDate to detect admin lock
   useEffect(() => {
     if (!user || !commDate) return
-    const ref = doc(db, 'commissions', `${user.uid}_${commDate}`)
+    const ref = doc(db, col('commissions'), `${user.uid}_${commDate}`)
     return onSnapshot(ref, (snap) => {
       setCommCurrentRecord(snap.exists() ? { id: snap.id, ...snap.data() } : null)
     })
@@ -281,7 +281,7 @@ export default function EmployeeHome() {
   }, [commRevenueInput])
 
   const commPenalty = 0
-  const calculatedCommission = (commRevenue * ((parseFloat(isDucTrong ? 15 : commRate) || 15) / 100)) - commPenalty
+  const calculatedCommission = (commRevenue * ((parseFloat(isDucTrong ? 15 : commRate) || 10) / 100)) - commPenalty
 
   const filteredCommHistory = useMemo(() => {
     if (!commSelectedWeek) return commHistory
@@ -316,7 +316,7 @@ export default function EmployeeHome() {
     setSaving(true)
     try {
       await runTransaction(db, async (tx) => {
-        const ref = doc(db, 'bills', code)
+        const ref = doc(db, col('bills'), code)
         const existing = await tx.get(ref)
         if (existing.exists()) throw new Error('DUPLICATE')
         const now = new Date()
@@ -357,7 +357,7 @@ export default function EmployeeHome() {
   async function handleDeleteBill(id, billFull) {
     if (!confirm(`Bạn có chắc chắn muốn xóa bill ${billFull}?`)) return
     try {
-      await deleteDoc(doc(db, 'bills', id))
+      await deleteDoc(doc(db, col('bills'), id))
     } catch (err) {
       console.error(err)
       alert('Không thể xóa bill. Vui lòng thử lại.')
@@ -384,7 +384,7 @@ export default function EmployeeHome() {
       const now = new Date()
       const randomStr = Math.random().toString(36).substring(2, 6)
       const docId = `debt_${user.uid}_${now.getTime()}_${randomStr}`
-      await setDoc(doc(db, 'boss_debts', docId), {
+      await setDoc(doc(db, col('boss_debts'), docId), {
         uid: user.uid,
         employeeName: profile?.name || user.email,
         boss: finalBossName,
@@ -413,7 +413,7 @@ export default function EmployeeHome() {
   async function handleDeleteBossDebt(id, boss, amount) {
     if (!confirm(`Bạn có chắc chắn muốn xóa khoản nợ của ${boss} — ${formatMoney(amount)}?`)) return
     try {
-      await deleteDoc(doc(db, 'boss_debts', id))
+      await deleteDoc(doc(db, col('boss_debts'), id))
     } catch (err) {
       console.error(err)
       alert('Không thể xóa. Vui lòng thử lại.')
@@ -433,7 +433,7 @@ export default function EmployeeHome() {
       const now = new Date()
       const randomStr = Math.random().toString(36).substring(2, 7)
       const docId = `bonchon_${user.uid}_${now.getTime()}_${randomStr}`
-      await setDoc(doc(db, 'bonchon_bills', docId), {
+      await setDoc(doc(db, col('bonchon_bills'), docId), {
         uid: user.uid,
         employeeName: profile?.name || user.email,
         address: addr,
@@ -462,7 +462,7 @@ export default function EmployeeHome() {
   async function handleDeleteBonchonBill(b) {
     if (!confirm(`Bạn có chắc chắn muốn xóa đơn Bonchon "${b.address}"?`)) return
     try {
-      await deleteDoc(doc(db, 'bonchon_bills', b.id))
+      await deleteDoc(doc(db, col('bonchon_bills'), b.id))
     } catch (err) {
       console.error(err)
       alert(`Không thể xóa (${err?.code || err?.message || 'Vui lòng thử lại'}).`)
@@ -483,14 +483,14 @@ export default function EmployeeHome() {
     setSavingComm(true)
     try {
       const docId = `${user.uid}_${commDate}`
-      await setDoc(doc(db, 'commissions', docId), {
+      await setDoc(doc(db, col('commissions'), docId), {
         uid: user.uid,
         employeeName: profile?.name || user.email,
         date: commDate,
         day: Number(commDate.split('-')[2]),
         yearMonth: commDate.slice(0, 7),
         revenue: commIsPenalty ? 0 : commRevenue,
-        rate: isDucTrong ? 15 : (parseFloat(commRate) || 15),
+        rate: isDucTrong ? 15 : (parseFloat(commRate) || 10),
         commission: commIsPenalty ? 0 : calculatedCommission,
         isPenalty: commIsPenalty,
         note: commNote.trim(),
@@ -510,7 +510,7 @@ export default function EmployeeHome() {
   async function handleDeleteComm(item) {
     if (!confirm(`Xóa hoa hồng ngày ${item.date}?`)) return
     try {
-      await deleteDoc(doc(db, 'commissions', item.id))
+      await deleteDoc(doc(db, col('commissions'), item.id))
     } catch (err) {
       console.error(err)
       alert('Không thể xóa. Vui lòng thử lại.')
@@ -1400,7 +1400,7 @@ export default function EmployeeHome() {
               </label>
 
               <label className="field">
-                <span>% Hoa hồng <span className="muted">(mặc định 15%)</span></span>
+                <span>% Hoa hồng <span className="muted">(mặc định 10%)</span></span>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <input
                     type="number"
@@ -1415,13 +1415,13 @@ export default function EmployeeHome() {
                       Boi hàn quốc cố định 15%
                     </span>
                   ) : (
-                    [10, 15, 20].map((r) => (
+                    [10, 20].map((r) => (
                       <button
                         key={r} type="button"
                         onClick={() => setCommRate(String(r))}
                         disabled={commIsPenalty}
                         style={{
-                          padding: '10px 14px', borderRadius: '10px', border: '1.5px solid',
+                          padding: '10px 18px', borderRadius: '10px', border: '1.5px solid',
                           borderColor: commIsPenalty ? 'var(--line)' : (commRate === String(r) ? 'var(--navy)' : 'var(--line)'),
                           background: commIsPenalty ? 'var(--paper)' : (commRate === String(r) ? 'var(--navy)' : 'var(--paper)'),
                           color: commIsPenalty ? 'var(--ink-soft)' : (commRate === String(r) ? '#ffffff' : 'var(--ink-soft)'),

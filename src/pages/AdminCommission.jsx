@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { formatMoney } from '../utils/date'
 
 function pad(n) {
@@ -19,7 +19,7 @@ export default function AdminCommission() {
   const now = new Date()
 
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     return onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }))
       list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'))
@@ -34,7 +34,7 @@ export default function AdminCommission() {
   const rankYearMonth = `${rankYear}-${pad(rankMonth)}`
 
   useEffect(() => {
-    const q = query(collection(db, 'commissions'), where('yearMonth', '==', rankYearMonth))
+    const q = query(collection(db, col('commissions')), where('yearMonth', '==', rankYearMonth))
     return onSnapshot(q, (snap) => {
       setRankRecords(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
     })

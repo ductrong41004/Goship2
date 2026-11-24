@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { getISOWeek, formatDateStr, formatMoney, getWeekDateRange } from '../utils/date'
 import { Link } from 'react-router-dom'
 
@@ -12,14 +12,14 @@ export default function AdminDashboard() {
   const weekRange = useMemo(() => getWeekDateRange(week, year), [week, year])
 
   useEffect(() => {
-    const q = query(collection(db, 'bills'), where('week', '==', week), where('year', '==', year))
+    const q = query(collection(db, col('bills')), where('week', '==', week), where('year', '==', year))
     return onSnapshot(q, (snap) => {
       setWeekBills(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
     })
   }, [week, year])
 
   useEffect(() => {
-    const q = query(collection(db, 'boss_debts'), where('week', '==', week), where('year', '==', year))
+    const q = query(collection(db, col('boss_debts')), where('week', '==', week), where('year', '==', year))
     return onSnapshot(q, (snap) => {
       setBossDebts(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
     })

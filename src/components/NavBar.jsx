@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { BRANCH_NAME } from '../firebase'
 
 export default function NavBar() {
   const { profile, isAdmin, logout } = useAuth()
@@ -26,7 +27,7 @@ export default function NavBar() {
         ) : (
           <div style={{ width: 8 }} />
         )}
-        <span className="navbar-title">{isAdmin ? 'GO SHIP' : 'GOSHIP'}</span>
+        <span className="navbar-title">{BRANCH_NAME ? `GO SHIP (${BRANCH_NAME})` : (isAdmin ? 'GO SHIP' : 'GOSHIP')}</span>
         <span className="navbar-right-user">{profile?.name}</span>
       </header>
 

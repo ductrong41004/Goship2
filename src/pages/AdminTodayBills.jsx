@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { formatDateStr, formatMoney } from '../utils/date'
 
 export default function AdminTodayBills() {
@@ -11,7 +11,7 @@ export default function AdminTodayBills() {
 
   useEffect(() => {
     // Chỉ lọc theo dateStr (không dùng orderBy để tránh phải tạo index composite mới)
-    const q = query(collection(db, 'bills'), where('dateStr', '==', today))
+    const q = query(collection(db, col('bills')), where('dateStr', '==', today))
     return onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
       // Sắp xếp theo giờ nhập mới nhất ở phía client

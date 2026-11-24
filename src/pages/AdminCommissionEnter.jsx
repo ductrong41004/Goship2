@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, doc, onSnapshot, query, setDoc, where } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { formatMoney } from '../utils/date'
 import DatePickerDMY from '../components/DatePickerDMY'
 
@@ -18,7 +18,7 @@ export default function AdminCommissionEnter() {
   const [selectedUid, setSelectedUid] = useState('')
   const [commDate, setCommDate] = useState(todayStr())
   const [revenueInput, setRevenueInput] = useState('')
-  const [rate, setRate] = useState('15')
+  const [rate, setRate] = useState('10')
   const [note, setNote] = useState('')
   const [isPenalty, setIsPenalty] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -29,7 +29,7 @@ export default function AdminCommissionEnter() {
 
   // Load employees
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     return onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }))
       list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'))
@@ -50,7 +50,7 @@ export default function AdminCommissionEnter() {
     const yearMonth = commDate.slice(0, 7)
     const dayNum = Number(commDate.split('-')[2])
     const q = query(
-      collection(db, 'commissions'),
+      collection(db, col('commissions')),
       where('yearMonth', '==', yearMonth),
       where('day', '==', dayNum)
     )
@@ -76,7 +76,7 @@ export default function AdminCommissionEnter() {
   }, [revenueInput])
 
   const penalty = 0
-  const effectiveRate = isDucTrong ? 15 : (parseFloat(rate) || 15)
+  const effectiveRate = isDucTrong ? 15 : (parseFloat(rate) || 10)
   const calculatedCommission = (revenue * (effectiveRate / 100)) - penalty
 
   // Check if selected employee already has entry for this date
@@ -99,7 +99,7 @@ export default function AdminCommissionEnter() {
     setSaving(true)
     try {
       const docId = `${selectedUid}_${commDate}`
-      await setDoc(doc(db, 'commissions', docId), {
+      await setDoc(doc(db, col('commissions'), docId), {
         uid: selectedUid,
         employeeName: selectedEmployee?.name || selectedUid,
         date: commDate,
@@ -116,7 +116,7 @@ export default function AdminCommissionEnter() {
       setRevenueInput('')
       setNote('')
       setIsPenalty(false)
-      setRate('15')
+      setRate('10')
     } catch (err) {
       console.error(err)
       setStatus({ type: 'error', text: 'Lưu thất bại. Vui lòng thử lại.' })
@@ -288,7 +288,7 @@ export default function AdminCommissionEnter() {
 
           {/* Rate */}
           <label className="field">
-            <span>% Hoa hồng <span className="muted">(mặc định 15%)</span></span>
+            <span>% Hoa hồng <span className="muted">(mặc định 10%)</span></span>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <input
                 type="number"
@@ -303,13 +303,13 @@ export default function AdminCommissionEnter() {
                   Boi hàn quốc cố định 15%
                 </span>
               ) : (
-                [10, 15, 20].map((r) => (
+                [10, 20].map((r) => (
                   <button
                     key={r} type="button"
                     onClick={() => setRate(String(r))}
                     disabled={isPenalty}
                     style={{
-                      padding: '10px 14px', borderRadius: '10px', border: '1.5px solid',
+                      padding: '10px 18px', borderRadius: '10px', border: '1.5px solid',
                       borderColor: isPenalty ? 'var(--line)' : (rate === String(r) ? 'var(--navy)' : 'var(--line)'),
                       background: isPenalty ? 'var(--paper)' : (rate === String(r) ? 'var(--navy)' : 'var(--paper)'),
                       color: isPenalty ? 'var(--ink-soft)' : (rate === String(r) ? '#ffffff' : 'var(--ink-soft)'),

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { useAuth } from '../contexts/AuthContext'
 
 const FONT_FAMILIES = [
@@ -79,7 +79,7 @@ export default function RulesPage() {
 
     async function loadRules() {
       try {
-        const snap = await getDoc(doc(db, 'config', 'rules'))
+        const snap = await getDoc(doc(db, col('config'), 'rules'))
         if (snap.exists() && snap.data().contentHtml) {
           const html = snap.data().contentHtml
           if (editorRef.current) {
@@ -125,7 +125,7 @@ export default function RulesPage() {
         editorRef.current.innerHTML = ''
       }
       localStorage.setItem('lottee_rules_html', '')
-      await setDoc(doc(db, 'config', 'rules'), {
+      await setDoc(doc(db, col('config'), 'rules'), {
         contentHtml: '',
         updatedAt: new Date().toISOString(),
       })
@@ -149,7 +149,7 @@ export default function RulesPage() {
     try {
       const html = editorRef.current?.innerHTML || ''
       localStorage.setItem('lottee_rules_html', html)
-      await setDoc(doc(db, 'config', 'rules'), {
+      await setDoc(doc(db, col('config'), 'rules'), {
         contentHtml: html,
         updatedAt: new Date().toISOString(),
       })

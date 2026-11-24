@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 
 export function useWeekBills(week, year) {
   const [bills, setBills] = useState([])
@@ -9,7 +9,7 @@ export function useWeekBills(week, year) {
   useEffect(() => {
     if (!week || !year) return
     setLoading(true)
-    const q = query(collection(db, 'bills'), where('week', '==', week), where('year', '==', year))
+    const q = query(collection(db, col('bills')), where('week', '==', week), where('year', '==', year))
     const unsub = onSnapshot(q, (snap) => {
       setBills(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
       setLoading(false)
@@ -27,7 +27,7 @@ export function useBonchonWeekBills(week, year) {
   useEffect(() => {
     if (!week || !year) return
     setLoading(true)
-    const q = query(collection(db, 'bonchon_bills'), where('week', '==', week), where('year', '==', year))
+    const q = query(collection(db, col('bonchon_bills')), where('week', '==', week), where('year', '==', year))
     const unsub = onSnapshot(q, (snap) => {
       setBills(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
       setLoading(false)

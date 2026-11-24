@@ -119,5 +119,110 @@ service cloud.firestore {
         && resource.data.status == 'pending'
       );
     }
+
+    // ==========================================
+    // CHI NHÁNH 2 (Tiền tố: cn2_)
+    // ==========================================
+    function myProfileCn2() {
+      return get(/databases/$(database)/documents/cn2_users/$(request.auth.uid)).data;
+    }
+
+    function isAdminCn2() {
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/cn2_users/$(request.auth.uid)) && myProfileCn2().role == 'admin')
+        || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && isAdmin())
+      );
+    }
+
+    function isActiveUserCn2() {
+      return isSignedIn() && (
+        isAdminCn2() ||
+        (exists(/databases/$(database)/documents/cn2_users/$(request.auth.uid)) && myProfileCn2().active != false)
+      );
+    }
+
+    match /cn2_users/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdminCn2());
+      allow write: if isAdminCn2();
+    }
+
+    match /cn2_config/{doc} {
+      allow read: if isSignedIn();
+      allow create, delete: if isAdminCn2();
+      allow update: if isAdminCn2() || isActiveUserCn2();
+    }
+
+    match /cn2_bills/{billId} {
+      allow read: if isSignedIn() && (isAdminCn2() || resource == null || resource.data.uid == request.auth.uid);
+      allow create: if isActiveUserCn2()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.amount in [10000, 15000]
+        && billId == request.resource.data.billFull;
+      allow update: if isAdminCn2() || (
+        isActiveUserCn2()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.amount in [10000, 15000]
+      );
+      allow delete: if isAdminCn2() || (
+        isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+      );
+    }
+
+    match /cn2_usernames/{username} {
+      allow read: if true;
+      allow write: if isAdminCn2();
+    }
+
+    match /cn2_payments/{id} {
+      allow read, write: if isAdminCn2();
+    }
+
+    match /cn2_commissions/{docId} {
+      allow read: if isSignedIn();
+      allow create, update: if isAdminCn2() || (isActiveUserCn2() && docId == request.auth.uid + "_" + request.resource.data.date);
+      allow delete: if isAdminCn2() || (isActiveUserCn2() && docId == request.auth.uid + "_" + resource.data.date);
+    }
+
+    match /cn2_boss_debts/{id} {
+      allow read: if isSignedIn() && (isAdminCn2() || resource == null || resource.data.uid == request.auth.uid);
+      allow create: if isActiveUserCn2()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if isAdminCn2() || (
+        isActiveUserCn2()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'pending'
+      );
+      allow delete: if isAdminCn2() || (
+        isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+      );
+    }
+
+    match /cn2_bonchon_bills/{id} {
+      allow read: if isSignedIn() && (isAdminCn2() || resource == null || resource.data.uid == request.auth.uid);
+      allow create: if isActiveUserCn2()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if isAdminCn2() || (
+        isActiveUserCn2()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'pending'
+      );
+      allow delete: if isAdminCn2() || (
+        isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+      );
+    }
   }
 }

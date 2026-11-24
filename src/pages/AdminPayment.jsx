@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { addDoc, collection, doc, serverTimestamp, writeBatch, getDocs, query, where, orderBy, onSnapshot } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { getISOWeek, formatMoney, recentWeeks, getWeekDateRange, formatMonthStr } from '../utils/date'
 import { useWeekBills } from '../utils/useWeekBills'
 import * as XLSX from 'xlsx'
@@ -22,7 +22,7 @@ export default function AdminPayment() {
   const [exportBusy, setExportBusy] = useState(false)
 
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     const unsub = onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }))
       list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'))
@@ -73,7 +73,7 @@ export default function AdminPayment() {
     if (!confirm(`Xác nhận thanh toán ${pending.length} bill, tổng ${formatMoney(grandTotal)} cho tuần ${sel.week}/${sel.year} (${range.from} – {range.to})?`)) return
     setBusy(true)
     try {
-      const paymentRef = await addDoc(collection(db, 'payments'), {
+      const paymentRef = await addDoc(collection(db, col('payments')), {
         week: sel.week,
         year: sel.year,
         createdAt: serverTimestamp(),
@@ -86,7 +86,7 @@ export default function AdminPayment() {
       for (let i = 0; i < pending.length; i += chunkSize) {
         const batch = writeBatch(db)
         for (const b of pending.slice(i, i + chunkSize)) {
-          batch.update(doc(db, 'bills', b.id), { status: 'paid', paymentId: paymentRef.id })
+          batch.update(doc(db, col('bills'), b.id), { status: 'paid', paymentId: paymentRef.id })
         }
         await batch.commit()
       }
@@ -108,7 +108,7 @@ export default function AdminPayment() {
       for (let i = 0; i < paidBills.length; i += chunkSize) {
         const batch = writeBatch(db)
         for (const b of paidBills.slice(i, i + chunkSize)) {
-          batch.delete(doc(db, 'bills', b.id))
+          batch.delete(doc(db, col('bills'), b.id))
         }
         await batch.commit()
       }
@@ -130,11 +130,11 @@ export default function AdminPayment() {
         exportBills = bills
         label = `Tuan_${sel.week}_${sel.year}`
       } else if (exportMode === 'month') {
-        const q = query(collection(db, 'bills'), where('monthStr', '==', monthSel))
+        const q = query(collection(db, col('bills')), where('monthStr', '==', monthSel))
         exportBills = (await getDocs(q)).docs.map((d) => d.data())
         label = `Thang_${monthSel}`
       } else {
-        const q = query(collection(db, 'bills'), where('uid', '==', empSel))
+        const q = query(collection(db, col('bills')), where('uid', '==', empSel))
         exportBills = (await getDocs(q)).docs.map((d) => d.data())
         const emp = allEmployees.find((e) => e.uid === empSel)
         label = `NhanVien_${(emp?.name || empSel).replace(/\s+/g, '_')}`

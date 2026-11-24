@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { collection, doc, getDocs, onSnapshot, query, setDoc, where, writeBatch } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 
 const FEATURES = [
   {
@@ -29,7 +29,7 @@ export default function AdminFeatureSettings() {
   const [msg, setMsg] = useState({})
 
   useEffect(() => {
-    const ref = doc(db, 'config', 'features')
+    const ref = doc(db, col('config'), 'features')
     return onSnapshot(ref, (snap) => {
       if (snap.exists()) {
         setFeatures(snap.data())
@@ -44,7 +44,7 @@ export default function AdminFeatureSettings() {
     setSaving((prev) => ({ ...prev, [key]: true }))
     setMsg((prev) => ({ ...prev, [key]: null }))
     try {
-      const ref = doc(db, 'config', 'features')
+      const ref = doc(db, col('config'), 'features')
       await setDoc(ref, { ...features, [key]: newVal }, { merge: true })
       setMsg((prev) => ({
         ...prev,
@@ -71,7 +71,7 @@ export default function AdminFeatureSettings() {
     setDeleting((prev) => ({ ...prev, [collectionName]: true }))
     setDelMsg((prev) => ({ ...prev, [collectionName]: null }))
     try {
-      const q = query(collection(db, collectionName), where('status', '==', 'paid'))
+      const q = query(collection(db, col(collectionName)), where('status', '==', 'paid'))
       const snap = await getDocs(q)
       if (snap.empty) {
         setDelMsg((prev) => ({ ...prev, [collectionName]: { type: 'info', text: 'Không có bill nào đã thanh toán.' } }))

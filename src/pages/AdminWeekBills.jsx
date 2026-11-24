@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, deleteDoc, doc, onSnapshot, query, where } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { getISOWeek, getWeekDateRange, formatMoney } from '../utils/date'
 import * as XLSX from 'xlsx'
 
@@ -30,7 +30,7 @@ export default function AdminWeekBills() {
   // Load all bills this week
   useEffect(() => {
     const q = query(
-      collection(db, 'bills'),
+      collection(db, col('bills')),
       where('week', '==', week),
       where('year', '==', year)
     )
@@ -82,7 +82,7 @@ export default function AdminWeekBills() {
   async function handleDeleteBill(bill) {
     if (!confirm(`Bạn có chắc chắn muốn xóa bill "${bill.billFull}" của nhân viên "${bill.employeeName || 'này'}" không?`)) return
     try {
-      await deleteDoc(doc(db, 'bills', bill.id))
+      await deleteDoc(doc(db, col('bills'), bill.id))
     } catch (err) {
       console.error(err)
       alert('Xóa bill thất bại. Vui lòng thử lại.')

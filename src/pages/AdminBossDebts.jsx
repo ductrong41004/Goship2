@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, onSnapshot, query, where, doc, updateDoc, deleteDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { formatMoney, getISOWeek, getWeekDateRange } from '../utils/date'
 import { Link } from 'react-router-dom'
 
@@ -37,7 +37,7 @@ export default function AdminBossDebts() {
 
   // Load employees
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     return onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }))
       list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'))
@@ -48,7 +48,7 @@ export default function AdminBossDebts() {
   // Load boss debts for selected month
   useEffect(() => {
     const q = query(
-      collection(db, 'boss_debts'),
+      collection(db, col('boss_debts')),
       where('monthStr', '==', yearMonth)
     )
     return onSnapshot(q, (snap) => {
@@ -103,7 +103,7 @@ export default function AdminBossDebts() {
   async function handleToggleStatus(item) {
     const newStatus = item.status === 'paid' ? 'pending' : 'paid'
     try {
-      await updateDoc(doc(db, 'boss_debts', item.id), { status: newStatus })
+      await updateDoc(doc(db, col('boss_debts'), item.id), { status: newStatus })
     } catch (err) {
       console.error(err)
       alert('Cập nhật thất bại. Vui lòng thử lại.')
@@ -113,7 +113,7 @@ export default function AdminBossDebts() {
   async function handleDelete(item) {
     if (!confirm(`Xóa khoản nợ của ${item.boss} — ${formatMoney(item.amount)} của ${item.employeeName}?`)) return
     try {
-      await deleteDoc(doc(db, 'boss_debts', item.id))
+      await deleteDoc(doc(db, col('boss_debts'), item.id))
     } catch (err) {
       console.error(err)
       alert('Xóa thất bại. Vui lòng thử lại.')

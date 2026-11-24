@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, col } from '../firebase'
 import { formatMoney } from '../utils/date'
 
 function removeVietnameseTones(str) {
@@ -39,7 +39,7 @@ export default function AdminEmployeeDeposits() {
 
   // Load employees from Firestore
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('role', '==', 'employee'))
+    const q = query(collection(db, col('users')), where('role', '==', 'employee'))
     return onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }))
       list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'))
@@ -64,7 +64,7 @@ export default function AdminEmployeeDeposits() {
     const nextVal = !emp.depositBag
     setSavingMap((prev) => ({ ...prev, [emp.uid]: true }))
     try {
-      await updateDoc(doc(db, 'users', emp.uid), {
+      await updateDoc(doc(db, col('users'), emp.uid), {
         depositBag: nextVal,
         depositUpdatedAt: new Date().toISOString(),
       })
@@ -83,7 +83,7 @@ export default function AdminEmployeeDeposits() {
     const nextVal = !emp.depositJacket
     setSavingMap((prev) => ({ ...prev, [emp.uid]: true }))
     try {
-      await updateDoc(doc(db, 'users', emp.uid), {
+      await updateDoc(doc(db, col('users'), emp.uid), {
         depositJacket: nextVal,
         depositUpdatedAt: new Date().toISOString(),
       })
@@ -113,7 +113,7 @@ export default function AdminEmployeeDeposits() {
 
     setSavingMap((prev) => ({ ...prev, [emp.uid]: true }))
     try {
-      await updateDoc(doc(db, 'users', emp.uid), {
+      await updateDoc(doc(db, col('users'), emp.uid), {
         depositAmount: cleanNum,
         depositUpdatedAt: new Date().toISOString(),
       })
@@ -132,7 +132,7 @@ export default function AdminEmployeeDeposits() {
     setLocalAmounts((prev) => ({ ...prev, [emp.uid]: formatNumberInput(amount) }))
     setSavingMap((prev) => ({ ...prev, [emp.uid]: true }))
     try {
-      await updateDoc(doc(db, 'users', emp.uid), {
+      await updateDoc(doc(db, col('users'), emp.uid), {
         depositAmount: amount,
         depositUpdatedAt: new Date().toISOString(),
       })
