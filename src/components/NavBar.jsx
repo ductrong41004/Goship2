@@ -14,17 +14,13 @@ export default function NavBar() {
   return (
     <>
       <header className="navbar">
-        {isAdmin ? (
-          <button className="navbar-toggle-btn" onClick={toggleDrawer} aria-label="Toggle menu">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-        ) : (
-          <div style={{ width: 8 }} />
-        )}
+        <button className="navbar-toggle-btn" onClick={toggleDrawer} aria-label="Toggle menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
         <span className="navbar-title">{BRANCH_NAME ? `GO SHIP (${BRANCH_NAME})` : (isAdmin ? 'GO SHIP' : 'GOSHIP')}</span>
         <span className="navbar-right-user">{profile?.name}</span>
       </header>
@@ -97,7 +93,7 @@ export default function NavBar() {
           ) : (
             <>
               <NavLink to="/" end className="drawer-link" onClick={closeDrawer}>
-                Thêm bill
+                💼 Sếp Nợ & Hoa Hồng
               </NavLink>
               <NavLink to="/rules" className="drawer-link" style={{ marginTop: '4px' }} onClick={closeDrawer}>
                 📜 Bảng nội quy

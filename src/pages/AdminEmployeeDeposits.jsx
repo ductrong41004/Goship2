@@ -210,7 +210,7 @@ export default function AdminEmployeeDeposits() {
         gap: '12px',
         marginBottom: '20px',
       }}>
-        <div className="card" style={{ padding: '16px', background: '#fff', textAlign: 'center' }}>
+        <div className="card" style={{ padding: '16px', textAlign: 'center' }}>
           <div className="muted small" style={{ fontSize: '12px', fontWeight: '600' }}>TỔNG TIỀN CỌC</div>
           <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--teal)', marginTop: '4px' }}>
             {formatMoney(stats.totalDeposit)}
@@ -220,7 +220,7 @@ export default function AdminEmployeeDeposits() {
           </div>
         </div>
 
-        <div className="card" style={{ padding: '16px', background: '#fff', textAlign: 'center' }}>
+        <div className="card" style={{ padding: '16px', textAlign: 'center' }}>
           <div className="muted small" style={{ fontSize: '12px', fontWeight: '600' }}>🎒 ĐÃ CẤP TÚI</div>
           <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--blue)', marginTop: '4px' }}>
             {stats.bagCount} <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--ink-soft)' }}>/ {stats.totalEmp}</span>
@@ -230,7 +230,7 @@ export default function AdminEmployeeDeposits() {
           </div>
         </div>
 
-        <div className="card" style={{ padding: '16px', background: '#fff', textAlign: 'center' }}>
+        <div className="card" style={{ padding: '16px', textAlign: 'center' }}>
           <div className="muted small" style={{ fontSize: '12px', fontWeight: '600' }}>🧥 ĐÃ CẤP ÁO KHOÁC</div>
           <div style={{ fontSize: '20px', fontWeight: '800', color: '#7c3aed', marginTop: '4px' }}>
             {stats.jacketCount} <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--ink-soft)' }}>/ {stats.totalEmp}</span>
@@ -242,7 +242,7 @@ export default function AdminEmployeeDeposits() {
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="card" style={{ padding: '14px 16px', marginBottom: '16px', background: '#fff' }}>
+      <div className="card" style={{ padding: '14px 16px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ flex: '1 1 260px', position: 'relative' }}>
             <input
@@ -296,7 +296,7 @@ export default function AdminEmployeeDeposits() {
       </div>
 
       {/* Main Employee Deposit List */}
-      <div className="card" style={{ padding: '0', background: '#fff', overflow: 'hidden' }}>
+      <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: '36px', textAlign: 'center', color: 'var(--ink-soft)' }}>
             Đang tải dữ liệu nhân viên…
@@ -566,9 +566,9 @@ const presetBtnStyle = {
   padding: '2px 6px',
   borderRadius: '6px',
   border: '1px solid var(--line)',
-  background: '#fff',
+  background: 'rgba(255, 255, 255, 0.08)',
   fontSize: '11px',
   fontWeight: '700',
-  color: 'var(--ink-soft)',
+  color: '#cbd5e1',
   cursor: 'pointer',
 }

@@ -27,7 +27,22 @@ function AppRoutes() {
   const { user, profile, loading, isAdmin, logout } = useAuth()
 
   if (loading) {
-    return <div className="center-screen">Đang tải…</div>
+    return (
+      <div className="center-screen">
+        <div className="loader-3d-wrapper">
+          <div className="loader-3d">
+            <div className="loader-3d-ring ring-1"></div>
+            <div className="loader-3d-ring ring-2"></div>
+            <div className="loader-3d-ring ring-3"></div>
+            <div className="loader-3d-core"></div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div className="loader-brand-title">GO SHIP RẠCH GIÁ</div>
+            <div className="loader-brand-sub" style={{ marginTop: '6px' }}>Đang tải dữ liệu…</div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (!user) {
@@ -37,8 +52,18 @@ function AppRoutes() {
   if (!profile) {
     return (
       <div className="center-screen">
-        <p>Tài khoản chưa được thiết lập. Vui lòng liên hệ Admin.</p>
-        <button className="link-btn" onClick={logout}>Đăng xuất</button>
+        <div className="auth-card" style={{ textAlign: 'center', maxWidth: '380px' }}>
+          <div style={{ fontSize: '42px', marginBottom: '14px' }}>⚠️</div>
+          <h2 style={{ margin: '0 0 10px', fontSize: '19px', color: '#ffffff', fontWeight: '800' }}>
+            Tài khoản chưa thiết lập
+          </h2>
+          <p className="muted" style={{ margin: '0 0 24px', fontSize: '14px', lineHeight: '1.5' }}>
+            Vui lòng liên hệ Admin để hoàn tất cấu hình và cấp quyền cho tài khoản.
+          </p>
+          <button className="btn-primary" onClick={logout} style={{ width: '100%' }}>
+            Đăng xuất
+          </button>
+        </div>
       </div>
     )
   }
@@ -46,8 +71,18 @@ function AppRoutes() {
   if (profile.active === false) {
     return (
       <div className="center-screen">
-        <p>Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ Admin.</p>
-        <button className="link-btn" onClick={logout}>Đăng xuất</button>
+        <div className="auth-card" style={{ textAlign: 'center', maxWidth: '380px' }}>
+          <div style={{ fontSize: '42px', marginBottom: '14px' }}>🚫</div>
+          <h2 style={{ margin: '0 0 10px', fontSize: '19px', color: '#ef4444', fontWeight: '800' }}>
+            Tài khoản bị vô hiệu hóa
+          </h2>
+          <p className="muted" style={{ margin: '0 0 24px', fontSize: '14px', lineHeight: '1.5' }}>
+            Tài khoản của bạn tạm thời đã bị khóa. Vui lòng liên hệ Admin.
+          </p>
+          <button className="btn-primary" onClick={logout} style={{ width: '100%' }}>
+            Đăng xuất
+          </button>
+        </div>
       </div>
     )
   }

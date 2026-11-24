@@ -55,30 +55,51 @@ export default function Login() {
           <img 
             src={`${import.meta.env.BASE_URL}icons/apple-touch-icon.png`} 
             alt="Go Ship" 
-            style={{ width: '48px', height: '48px', borderRadius: '12px', objectFit: 'cover' }} 
+            style={{ 
+              width: '52px', 
+              height: '52px', 
+              borderRadius: '14px', 
+              objectFit: 'cover',
+              boxShadow: '0 6px 20px rgba(0, 0, 0, 0.4), 0 0 16px rgba(59, 130, 246, 0.3)',
+              border: '1.5px solid rgba(59, 130, 246, 0.35)'
+            }} 
           />
           <div>
             <h1>{BRANCH_NAME ? `GO SHIP - ${BRANCH_NAME}` : 'GO SHIP'}</h1>
-            <p className="muted">Đăng nhập để bắt đầu nhập bill</p>
+            <p className="muted" style={{ fontSize: '13.5px', marginTop: '2px' }}>Đăng nhập để vào hệ thống</p>
           </div>
         </div>
         <form onSubmit={handleSubmit} className="stack">
           <label className="field">
-            <span>Tên Đăng Nhập</span>
+            <span>Tên Đăng Nhập hoặc Mật Khẩu Admin</span>
             <input
               type="text"
               value={loginInput}
               onChange={(e) => setLoginInput(e.target.value)}
-              placeholder=""
+              placeholder="Nhập tên nhân viên..."
+              autoComplete="username"
               required
             />
           </label>
-          {error && <div className="error-text">{error}</div>}
-          <button className="btn-primary" type="submit" disabled={busy}>
-            {busy ? 'Đang đăng nhập…' : 'Đăng nhập'}
+          {error && (
+            <div className="error-text" style={{ 
+              background: 'rgba(239, 68, 68, 0.12)', 
+              border: '1px solid rgba(239, 68, 68, 0.25)', 
+              padding: '10px 14px', 
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          )}
+          <button className="btn-primary" type="submit" disabled={busy} style={{ width: '100%', marginTop: '6px' }}>
+            {busy ? 'Đang xác thực…' : 'Đăng Nhập'}
           </button>
         </form>
-        <p className="muted small" style={{ textAlign: 'center', marginTop: '12px' }}>
+        <p className="muted small" style={{ textAlign: 'center', marginTop: '18px' }}>
           Nhắn anh Hào hoặc anh Linh cấp tài khoản
         </p>
       </div>

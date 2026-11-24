@@ -333,7 +333,8 @@ export default function AdminSettings() {
       {stkModal.open && stkModal.emp && (
         <div
           style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+            position: 'fixed', inset: 0, background: 'rgba(3, 7, 18, 0.75)',
+            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
             zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '16px',
           }}
@@ -341,21 +342,25 @@ export default function AdminSettings() {
         >
           <div
             style={{
-              background: '#fff', borderRadius: '18px', padding: '24px',
-              width: '100%', maxWidth: '380px',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.25)',
+              background: 'linear-gradient(160deg, #121f45 0%, #0d1733 100%)',
+              border: '1px solid rgba(59, 130, 246, 0.35)',
+              borderRadius: '22px', padding: '24px',
+              width: '100%', maxWidth: '420px',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(37,99,235,0.2)',
+              animation: 'modalPop3D 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: 'var(--navy)' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#ffffff' }}>
                 {stkModal.isEditing ? '💳 Nhập số tài khoản' : '📷 Mã QR Nhân Viên'}
               </h3>
               <button
                 onClick={closeStkModal}
                 style={{
-                  background: 'none', border: 'none', fontSize: '22px',
-                  cursor: 'pointer', color: 'var(--ink-soft)', lineHeight: 1,
+                  background: 'rgba(255, 255, 255, 0.08)', border: 'none', fontSize: '20px',
+                  cursor: 'pointer', color: '#94a3b8', lineHeight: 1, width: '30px', height: '30px',
+                  borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}
               >
                 &times;
@@ -363,7 +368,7 @@ export default function AdminSettings() {
             </div>
 
             <p style={{ margin: '0 0 16px', fontSize: '13px', color: 'var(--ink-soft)' }}>
-              Nhân viên: <strong style={{ color: 'var(--ink)' }}>{stkModal.emp.name}</strong>
+              Nhân viên: <strong style={{ color: '#38bdf8' }}>{stkModal.emp.name}</strong>
               {stkModal.emp.username && <span> ({stkModal.emp.username})</span>}
             </p>
 
@@ -383,8 +388,8 @@ export default function AdminSettings() {
                     }}
                     style={{
                       width: '100%', padding: '11px 12px', borderRadius: '10px',
-                      border: '1.5px solid var(--line)', background: '#fff',
-                      fontSize: '14px', fontWeight: '600', color: 'var(--ink)',
+                      border: '1.5px solid var(--line)', background: 'rgba(11, 20, 46, 0.9)',
+                      fontSize: '14px', fontWeight: '600', color: '#ffffff',
                     }}
                   >
                     {banks.map((b) => (
@@ -468,8 +473,8 @@ export default function AdminSettings() {
                       alert(`Đã copy số tài khoản: ${stkModal.stk}`)
                     }}
                     style={{
-                      padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--line)',
-                      background: '#fff', fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+                      padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--line)',
+                      background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff', fontSize: '12.5px', fontWeight: '700', cursor: 'pointer',
                     }}
                   >
                     📋 Copy STK
@@ -478,7 +483,7 @@ export default function AdminSettings() {
 
                 {/* Cú pháp nội dung chuyển khoản */}
                 <label className="field" style={{ marginBottom: '14px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--navy)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: '#60a5fa' }}>
                     📝 Nội dung chuyển khoản:
                   </span>
                   <input
@@ -487,9 +492,9 @@ export default function AdminSettings() {
                     onChange={(e) => setStkModal({ ...stkModal, memo: e.target.value })}
                     placeholder="Goship chuyen tien thanh toan"
                     style={{
-                      padding: '9px 12px', borderRadius: '10px',
-                      border: '1.5px solid var(--line)', fontSize: '13px',
-                      background: '#fff', fontWeight: '500',
+                      padding: '10px 14px', borderRadius: '10px',
+                      border: '1.5px solid var(--line)', fontSize: '13.5px',
+                      background: 'rgba(11, 20, 46, 0.9)', color: '#ffffff', fontWeight: '500',
                     }}
                   />
                 </label>

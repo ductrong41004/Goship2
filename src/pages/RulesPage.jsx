@@ -194,9 +194,9 @@ export default function RulesPage() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
                 padding: '10px 18px', fontSize: '14px', fontWeight: '700',
-                borderRadius: '10px', border: '1.5px solid #fecaca',
-                background: '#fff', color: '#dc2626', cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(220, 38, 38, 0.08)',
+                borderRadius: '10px', border: '1.5px solid rgba(239, 68, 68, 0.4)',
+                background: 'rgba(239, 68, 68, 0.12)', color: '#f87171', cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(220, 38, 38, 0.15)',
               }}
             >
               🗑️ Xoá Trắng Nội Quy
@@ -217,7 +217,7 @@ export default function RulesPage() {
       {/* Word-style Toolbar (chỉ hiện cho Admin) */}
       {isAdmin && (
         <div style={{
-          background: '#f8fafc',
+          background: 'rgba(14, 25, 56, 0.9)',
           border: '1.5px solid var(--line)',
           borderRadius: '14px 14px 0 0',
           padding: '10px 12px',
@@ -225,7 +225,7 @@ export default function RulesPage() {
           flexWrap: 'wrap',
           gap: '8px',
           alignItems: 'center',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
         }}>
           {/* Nhóm Phông chữ */}
           <select
@@ -236,7 +236,7 @@ export default function RulesPage() {
             }}
             style={{
               padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--line)',
-              fontSize: '13px', background: '#fff', fontWeight: '600', cursor: 'pointer',
+              fontSize: '13px', background: 'rgba(11, 20, 46, 0.9)', color: '#ffffff', fontWeight: '600', cursor: 'pointer',
             }}
           >
             {FONT_FAMILIES.map((f) => (
@@ -253,7 +253,7 @@ export default function RulesPage() {
             }}
             style={{
               padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--line)',
-              fontSize: '13px', background: '#fff', fontWeight: '600', cursor: 'pointer',
+              fontSize: '13px', background: 'rgba(11, 20, 46, 0.9)', color: '#ffffff', fontWeight: '600', cursor: 'pointer',
             }}
           >
             {FONT_SIZES.map((s) => (
@@ -482,11 +482,11 @@ export default function RulesPage() {
       {/* Trang soạn thảo kiểu Tờ giấy A4 (Word Paper) */}
       <div
         style={{
-          background: '#fff',
+          background: 'rgba(14, 25, 56, 0.8)',
           borderRadius: isAdmin ? '0 0 14px 14px' : '14px',
           border: '1.5px solid var(--line)',
           borderTop: isAdmin ? 'none' : '1.5px solid var(--line)',
-          boxShadow: '0 6px 24px rgba(0,0,0,0.06)',
+          boxShadow: '0 6px 24px rgba(0,0,0,0.5)',
           minHeight: '600px',
           position: 'relative',
         }}
@@ -517,7 +517,6 @@ export default function RulesPage() {
             className="btn-primary"
             style={{
               padding: '11px 24px', fontSize: '15px', fontWeight: '700',
-              boxShadow: '0 4px 14px rgba(15, 61, 62, 0.25)',
             }}
           >
             💾 {saving ? 'Đang lưu…' : 'Lưu Bảng Nội Quy'}
@@ -534,10 +533,10 @@ const toolBtnStyle = {
   padding: '2px 8px',
   borderRadius: '6px',
   border: '1px solid var(--line)',
-  background: '#fff',
+  background: 'rgba(255, 255, 255, 0.08)',
   fontSize: '13px',
   fontWeight: '700',
-  color: 'var(--ink)',
+  color: '#ffffff',
   cursor: 'pointer',
   display: 'inline-flex',
   alignItems: 'center',

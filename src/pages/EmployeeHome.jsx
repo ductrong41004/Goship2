@@ -523,32 +523,35 @@ export default function EmployeeHome() {
 
       {/* Floating Action Buttons */}
       <div style={{
-        position: 'fixed', bottom: '20px', right: '20px',
-        display: 'flex', gap: '8px', zIndex: 50,
+        position: 'fixed', bottom: '22px', right: '20px',
+        display: 'flex', gap: '10px', zIndex: 50,
       }}>
         <button
           onClick={() => setShowRules(true)}
           style={{
-            background: '#fff', color: 'var(--navy)',
-            border: '2px solid var(--navy)', borderRadius: '50px',
-            padding: '10px 16px', fontSize: '13px', fontWeight: '800',
+            background: 'rgba(14, 25, 56, 0.92)', color: '#38bdf8',
+            border: '1.5px solid rgba(56, 189, 248, 0.4)', borderRadius: '50px',
+            padding: '11px 18px', fontSize: '13.5px', fontWeight: '800',
             cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.6), 0 0 16px rgba(56, 189, 248, 0.25)',
             display: 'flex', alignItems: 'center', gap: '6px',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.15s ease'
           }}
         >
-          📜 Bảng nội quy
+          📜 Nội quy
         </button>
 
         <button
           onClick={() => setShowQR(true)}
           style={{
-            background: 'var(--navy)', color: '#fff',
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#ffffff',
             border: 'none', borderRadius: '50px',
-            padding: '10px 16px', fontSize: '13px', fontWeight: '700',
+            padding: '11px 18px', fontSize: '13.5px', fontWeight: '800',
             cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(255,255,255,0.35)',
             display: 'flex', alignItems: 'center', gap: '6px',
+            transition: 'all 0.15s ease'
           }}
         >
           📷 Mã QR
@@ -559,7 +562,8 @@ export default function EmployeeHome() {
       {showQR && (
         <div
           style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+            position: 'fixed', inset: 0, background: 'rgba(3, 7, 18, 0.75)',
+            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
             zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '16px',
           }}
@@ -567,31 +571,41 @@ export default function EmployeeHome() {
         >
           <div
             style={{
-              background: '#fff', borderRadius: '20px', padding: '24px',
-              width: '100%', maxWidth: '340px', textAlign: 'center',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.25)',
+              background: 'linear-gradient(160deg, #121f45 0%, #0d1733 100%)',
+              border: '1px solid rgba(59, 130, 246, 0.35)',
+              borderRadius: '24px', padding: '26px',
+              width: '100%', maxWidth: '360px', textAlign: 'center',
+              boxShadow: '0 25px 60px -10px rgba(0, 0, 0, 0.8), 0 0 35px rgba(37, 99, 235, 0.25)',
+              animation: 'modalPop3D 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: '800', color: 'var(--navy)' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '19px', fontWeight: '800', color: '#ffffff' }}>
               📷 Mã QR Go Ship
             </h3>
-            <p style={{ margin: '0 0 16px', fontSize: '13px', color: 'var(--ink-soft)' }}>
-              Quet mã để chuyển tiền
+            <p style={{ margin: '0 0 16px', fontSize: '13.5px', color: '#94a3b8' }}>
+              Quét mã để chuyển tiền nhanh chóng
             </p>
             <img
               src={`${import.meta.env.BASE_URL}qrgoship.jpg`}
               alt="QR Go Ship"
-              style={{ width: '100%', borderRadius: '12px', display: 'block', marginBottom: '16px' }}
+              style={{ 
+                width: '100%', 
+                borderRadius: '16px', 
+                display: 'block', 
+                marginBottom: '18px',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+              }}
             />
 
             <button
               onClick={() => { setShowQR(false); setShowRules(true); }}
               style={{
-                width: '100%', marginBottom: '14px', padding: '9px 12px',
-                borderRadius: '10px', border: '1.5px solid var(--navy)',
-                background: 'rgba(15, 61, 62, 0.05)', color: 'var(--navy)',
-                fontWeight: '700', fontSize: '13px', cursor: 'pointer',
+                width: '100%', marginBottom: '14px', padding: '11px 14px',
+                borderRadius: '12px', border: '1.5px solid rgba(56, 189, 248, 0.3)',
+                background: 'rgba(56, 189, 248, 0.08)', color: '#38bdf8',
+                fontWeight: '700', fontSize: '13.5px', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
               }}
             >
@@ -602,9 +616,9 @@ export default function EmployeeHome() {
               <button
                 onClick={() => setShowQR(false)}
                 style={{
-                  flex: 1, padding: '11px', borderRadius: '12px',
-                  border: '1.5px solid var(--line)', background: 'var(--paper)',
-                  fontWeight: '600', fontSize: '14px', cursor: 'pointer',
+                  flex: 1, padding: '12px', borderRadius: '12px',
+                  border: '1px solid rgba(59, 130, 246, 0.25)', background: 'rgba(255,255,255,0.06)',
+                  color: '#e2e8f0', fontWeight: '700', fontSize: '14px', cursor: 'pointer',
                 }}
               >
                 Đóng
@@ -612,9 +626,9 @@ export default function EmployeeHome() {
               <a
                 href={`${import.meta.env.BASE_URL}qrgoship.jpg`}
                 download="qrgoship.jpg"
+                className="btn-primary"
                 style={{
-                  flex: 2, padding: '11px', borderRadius: '12px',
-                  background: 'var(--navy)', color: '#fff',
+                  flex: 2, padding: '12px', borderRadius: '12px',
                   fontWeight: '700', fontSize: '14px', cursor: 'pointer',
                   textDecoration: 'none', display: 'flex', alignItems: 'center',
                   justifyContent: 'center', gap: '6px',
@@ -631,7 +645,8 @@ export default function EmployeeHome() {
       {showRules && (
         <div
           style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',
+            position: 'fixed', inset: 0, background: 'rgba(3, 7, 18, 0.78)',
+            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
             zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '16px',
           }}
@@ -639,21 +654,23 @@ export default function EmployeeHome() {
         >
           <div
             style={{
-              background: '#fff', borderRadius: '20px',
+              background: '#0d1733', borderRadius: '24px',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
               width: '100%', maxWidth: '680px', maxHeight: '90vh',
               display: 'flex', flexDirection: 'column',
-              boxShadow: '0 12px 48px rgba(0,0,0,0.3)',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 30px rgba(37, 99, 235, 0.2)',
               overflow: 'hidden',
+              animation: 'modalPop3D 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div style={{
-              padding: '16px 20px', borderBottom: '1px solid var(--line)',
+              padding: '16px 20px', borderBottom: '1px solid rgba(59, 130, 246, 0.2)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              background: 'var(--navy)', color: '#fff',
+              background: 'linear-gradient(135deg, #1e3a8a 0%, #172554 100%)', color: '#fff',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '20px' }}>📜</span>
                 <h3 style={{ margin: 0, fontSize: '17px', fontWeight: '800', color: '#fff' }}>
                   Bảng Nội Quy GOSHIP
@@ -662,21 +679,23 @@ export default function EmployeeHome() {
               <button
                 onClick={() => setShowRules(false)}
                 style={{
-                  background: 'none', border: 'none', color: '#fff',
-                  fontSize: '24px', cursor: 'pointer', lineHeight: 1, padding: 0,
+                  background: 'rgba(255, 255, 255, 0.1)', border: 'none', color: '#fff',
+                  fontSize: '22px', cursor: 'pointer', lineHeight: 1, padding: 0,
+                  width: '32px', height: '32px', borderRadius: '8px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}
               >
                 &times;
               </button>
             </div>
 
-            {/* Modal Body: Rules Content OR Video when empty */}
+            {/* Modal Body */}
             <div
               style={{
                 padding: isHtmlEmpty(rulesHtml) ? '20px' : '28px',
                 overflowY: 'auto', flex: 1,
                 fontSize: '15px', lineHeight: '1.7', color: 'var(--ink)',
-                background: isHtmlEmpty(rulesHtml) ? '#0f172a' : '#fff',
+                background: isHtmlEmpty(rulesHtml) ? '#080f24' : '#0d1733',
                 textAlign: isHtmlEmpty(rulesHtml) ? 'center' : 'left',
               }}
             >
@@ -734,13 +753,13 @@ export default function EmployeeHome() {
 
             {/* Modal Footer */}
             <div style={{
-              padding: '12px 20px', borderTop: '1px solid var(--line)',
-              background: '#f8fafc', display: 'flex', justifyContent: 'flex-end',
+              padding: '14px 20px', borderTop: '1px solid rgba(59, 130, 246, 0.2)',
+              background: 'rgba(10, 18, 42, 0.95)', display: 'flex', justifyContent: 'flex-end',
             }}>
               <button
                 className="btn-primary"
                 onClick={() => setShowRules(false)}
-                style={{ padding: '9px 24px', fontSize: '14px', borderRadius: '10px' }}
+                style={{ padding: '10px 24px', fontSize: '14px', borderRadius: '12px' }}
               >
                 Đã hiểu & Đóng
               </button>
