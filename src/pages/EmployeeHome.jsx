@@ -747,7 +747,7 @@ export default function EmployeeHome() {
                   </p>
                 </div>
               ) : (
-                <div dangerouslySetInnerHTML={{ __html: rulesHtml }} />
+                <div className="rules-paper" style={{ padding: '10px 6px', background: 'transparent', border: 'none', boxShadow: 'none' }} dangerouslySetInnerHTML={{ __html: rulesHtml }} />
               )}
             </div>
 

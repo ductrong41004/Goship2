@@ -33,28 +33,49 @@ const QUICK_HIGHLIGHTS = [
 ]
 
 const DEFAULT_RULES_HTML = `
-  <h1 style="text-align: center; color: #1e3a8a; margin-bottom: 8px;">📜 BẢNG NỘI QUY GOSHIP</h1>
-  <p style="text-align: center; color: #64748b; font-size: 14px; margin-bottom: 24px;"><em>(Áp dụng cho toàn thể nhân viên)</em></p>
+  <div style="text-align: center; margin-bottom: 24px;">
+    <h1 style="color: #38bdf8; font-size: 24px; font-weight: 800; margin: 0 0 8px; text-shadow: 0 0 16px rgba(56, 189, 248, 0.4);">
+      📜 BẢNG NỘI QUY GOSHIP
+    </h1>
+    <p style="color: #94a3b8; font-size: 14px; margin: 0; font-style: italic;">
+      (Áp dụng cho toàn thể nhân viên chi nhánh)
+    </p>
+  </div>
   
-  <h2 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">1. Thời gian làm việc</h2>
-  <ul>
-    <li>Nhân viên có mặt đúng giờ theo ca phân công.</li>
-    <li>Nghỉ phép cần báo trước cho quản lý ít nhất 1 ngày.</li>
+  <h2 style="color: #60a5fa; font-size: 17px; font-weight: 800; border-bottom: 1.5px solid rgba(59, 130, 246, 0.3); padding-bottom: 8px; margin-top: 24px;">
+    1. Thời gian làm việc
+  </h2>
+  <ul style="color: #f1f5f9; line-height: 1.8; font-size: 15px;">
+    <li style="margin-bottom: 8px;">Nhân viên có mặt đúng giờ theo ca phân công.</li>
+    <li style="margin-bottom: 8px;">Nghỉ phép cần báo trước cho quản lý ít nhất 1 ngày.</li>
   </ul>
 
-  <h2 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">2. Quy trình giao nhận & Quản lý bill</h2>
-  <ul>
-    <li>Nhập đầy đủ mã bill vào hệ thống ngay khi hoàn tất đơn hàng.</li>
-    <li>Kiểm tra kỹ thông tin đơn và số tiền thanh toán.</li>
-    <li>Báo cáo ngay cho quản lý nếu có sự cố đơn hàng hoặc bill thất lạc.</li>
+  <h2 style="color: #60a5fa; font-size: 17px; font-weight: 800; border-bottom: 1.5px solid rgba(59, 130, 246, 0.3); padding-bottom: 8px; margin-top: 24px;">
+    2. Quy trình giao nhận & Quản lý bill
+  </h2>
+  <ul style="color: #f1f5f9; line-height: 1.8; font-size: 15px;">
+    <li style="margin-bottom: 8px;">Nhập đầy đủ mã bill vào hệ thống ngay khi hoàn tất đơn hàng.</li>
+    <li style="margin-bottom: 8px;">Kiểm tra kỹ thông tin đơn và số tiền thanh toán.</li>
+    <li style="margin-bottom: 8px;">Báo cáo ngay cho quản lý nếu có sự cố đơn hàng hoặc bill thất lạc.</li>
   </ul>
 
-  <h2 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">3. Tác phong & Thái độ phục vụ</h2>
-  <ul>
-    <li>Thái độ hòa nhã, lịch sự, nhiệt tình với khách hàng.</li>
-    <li>Giữ gìn vệ sinh chung, bảo quản trang thiết bị cửa hàng.</li>
+  <h2 style="color: #60a5fa; font-size: 17px; font-weight: 800; border-bottom: 1.5px solid rgba(59, 130, 246, 0.3); padding-bottom: 8px; margin-top: 24px;">
+    3. Tác phong & Thái độ phục vụ
+  </h2>
+  <ul style="color: #f1f5f9; line-height: 1.8; font-size: 15px;">
+    <li style="margin-bottom: 8px;">Thái độ hòa nhã, lịch sự, nhiệt tình với khách hàng.</li>
+    <li style="margin-bottom: 8px;">Giữ gìn vệ sinh chung, bảo quản trang thiết bị cửa hàng.</li>
   </ul>
 `
+
+function modernizeRulesHtml(html) {
+  if (!html) return html
+  return html
+    .replace(/#1e3a8a/gi, '#38bdf8')
+    .replace(/#0f172a/gi, '#60a5fa')
+    .replace(/#64748b/gi, '#94a3b8')
+    .replace(/#e2e8f0/gi, 'rgba(59, 130, 246, 0.3)')
+}
 
 export default function RulesPage() {
   const { isAdmin } = useAuth()
@@ -67,21 +88,21 @@ export default function RulesPage() {
 
   const [currentFont, setCurrentFont] = useState(FONT_FAMILIES[0].value)
   const [currentSize, setCurrentSize] = useState('3')
-  const [currentColor, setCurrentColor] = useState('#000000')
+  const [currentColor, setCurrentColor] = useState('#ffffff')
   const [currentBgColor, setCurrentBgColor] = useState('#ffffff')
 
   // Load from localStorage immediately so page never renders empty
   useEffect(() => {
     const cached = localStorage.getItem('lottee_rules_html')
     if (editorRef.current) {
-      editorRef.current.innerHTML = cached || DEFAULT_RULES_HTML
+      editorRef.current.innerHTML = modernizeRulesHtml(cached || DEFAULT_RULES_HTML)
     }
 
     async function loadRules() {
       try {
         const snap = await getDoc(doc(db, col('config'), 'rules'))
         if (snap.exists() && snap.data().contentHtml) {
-          const html = snap.data().contentHtml
+          const html = modernizeRulesHtml(snap.data().contentHtml)
           if (editorRef.current) {
             editorRef.current.innerHTML = html
           }
@@ -171,11 +192,11 @@ export default function RulesPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: 'var(--navy)' }}>
+          <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '800', color: '#ffffff' }}>
             📜 Bảng Nội Quy GOSHIP
           </h2>
-          <p className="muted small" style={{ margin: '4px 0 0' }}>
-            {isAdmin ? 'Nhấp trực tiếp vào văn bản bên dưới để chỉnh sửa như Word rồi bấm "Lưu Nội Quy".' : 'Xem nội quy hoạt động GOSHIP.'}
+          <p style={{ margin: '6px 0 0', color: '#94a3b8', fontSize: '13.5px' }}>
+            {isAdmin ? 'Nhấp trực tiếp vào văn bản bên dưới để chỉnh sửa như Word rồi bấm "Lưu Bảng Nội Quy".' : 'Xem nội quy hoạt động GOSHIP.'}
             {lastSaved && <span> (Cập nhật lần cuối: {lastSaved})</span>}
           </p>
         </div>
@@ -481,12 +502,10 @@ export default function RulesPage() {
 
       {/* Trang soạn thảo kiểu Tờ giấy A4 (Word Paper) */}
       <div
+        className="rules-paper"
         style={{
-          background: 'rgba(14, 25, 56, 0.8)',
-          borderRadius: isAdmin ? '0 0 14px 14px' : '14px',
-          border: '1.5px solid var(--line)',
-          borderTop: isAdmin ? 'none' : '1.5px solid var(--line)',
-          boxShadow: '0 6px 24px rgba(0,0,0,0.5)',
+          borderRadius: isAdmin ? '0 0 20px 20px' : '20px',
+          borderTop: isAdmin ? 'none' : '1px solid rgba(59, 130, 246, 0.35)',
           minHeight: '600px',
           position: 'relative',
         }}
@@ -497,12 +516,8 @@ export default function RulesPage() {
           suppressContentEditableWarning
           onInput={() => setHasChanges(true)}
           style={{
-            minHeight: '600px',
-            padding: '36px 40px',
+            minHeight: '520px',
             outline: 'none',
-            fontSize: '16px',
-            lineHeight: '1.7',
-            color: 'var(--ink)',
             fontFamily: currentFont,
             cursor: isAdmin ? 'text' : 'default',
           }}
