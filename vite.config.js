@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 // then base should be '/lottee-bill-app/'
 // If you deploy to Firebase Hosting instead, set base to '/'.
 export default defineConfig({
-  base: '/lottee-bill-app/',
+  base: '/lottee-chinhanh-2/',
   plugins: [
     react(),
     VitePWA({
@@ -21,8 +21,8 @@ export default defineConfig({
         background_color: '#f5f2ec',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/lottee-bill-app/',
-        scope: '/lottee-bill-app/',
+        start_url: '/lottee-chinhanh-2/',
+        scope: '/lottee-chinhanh-2/',
         icons: [
           {
             src: 'icons/icon-192.png',
