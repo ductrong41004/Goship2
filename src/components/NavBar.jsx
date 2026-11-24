@@ -6,8 +6,6 @@ import { BRANCH_NAME } from '../firebase'
 export default function NavBar() {
   const { profile, isAdmin, logout } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
-  const [lotteeOpen, setLotteeOpen] = useState(true)
-  const [bonchonOpen, setBonchonOpen] = useState(true)
   const [commissionOpen, setCommissionOpen] = useState(true)
 
   const toggleDrawer = () => setIsOpen(!isOpen)
@@ -44,50 +42,10 @@ export default function NavBar() {
         <div className="drawer-content">
           {isAdmin ? (
             <>
-              {/* LOTTEE Accordion Group */}
-              <div className="drawer-group">
-                <div 
-                  className={`drawer-group-header ${lotteeOpen ? 'open' : ''}`} 
-                  onClick={() => setLotteeOpen(!lotteeOpen)}
-                >
-                  <span>LOTTEE</span>
-                  <span className="caret" style={{ display: 'inline-block' }}>▶</span>
-                </div>
-                {lotteeOpen && (
-                  <div className="drawer-group-items">
-                    <NavLink to="/admin" end className="drawer-sub-link" onClick={closeDrawer}>
-                      Tổng quan
-                    </NavLink>
-                    <NavLink to="/admin/week-bills" className="drawer-sub-link" onClick={closeDrawer}>
-                      Chi Tiết Bill Tuần
-                    </NavLink>
-                    <NavLink to="/admin/employees" className="drawer-sub-link" onClick={closeDrawer}>
-                      Tổng Tiền Lottee
-                    </NavLink>
-                  </div>
-                )}
-              </div>
-
-              {/* BONCHON Accordion Group */}
-              <div className="drawer-group" style={{ marginTop: '8px' }}>
-                <div 
-                  className={`drawer-group-header ${bonchonOpen ? 'open' : ''}`} 
-                  onClick={() => setBonchonOpen(!bonchonOpen)}
-                >
-                  <span>BONCHON</span>
-                  <span className="caret" style={{ display: 'inline-block' }}>▶</span>
-                </div>
-                {bonchonOpen && (
-                  <div className="drawer-group-items">
-                    <NavLink to="/admin/bonchon/week-bills" className="drawer-sub-link" onClick={closeDrawer}>
-                      Chi Tiết Bill Tuần
-                    </NavLink>
-                    <NavLink to="/admin/bonchon/employees" className="drawer-sub-link" onClick={closeDrawer}>
-                      Tổng Tiền BONCHON
-                    </NavLink>
-                  </div>
-                )}
-              </div>
+              {/* TỔNG QUAN Direct Link */}
+              <NavLink to="/admin" end className="drawer-link" onClick={closeDrawer}>
+                📊 Tổng quan
+              </NavLink>
 
               {/* HOA HỒNG Accordion Group */}
               <div className="drawer-group" style={{ marginTop: '8px' }}>

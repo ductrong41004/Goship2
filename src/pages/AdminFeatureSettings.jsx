@@ -4,18 +4,6 @@ import { db, col } from '../firebase'
 
 const FEATURES = [
   {
-    key: 'lottee',
-    label: 'Tính Tiền Lottee',
-    icon: '🟡',
-    desc: 'Cho phép nhân viên nhập bill Lottee.',
-  },
-  {
-    key: 'bonchon',
-    label: 'Tính Tiền BONCHON',
-    icon: '🔴',
-    desc: 'Cho phép nhân viên nhập đơn BONCHON.',
-  },
-  {
     key: 'bossDebt',
     label: 'Tính Tiền Sếp Nợ',
     icon: '💰',
@@ -252,8 +240,6 @@ export default function AdminFeatureSettings() {
       </p>
 
       {[
-        { col: 'bills',        label: 'Lottee',   icon: '🟡', desc: 'Xoá tất cả bill Lottee đã được thanh toán.' },
-        { col: 'bonchon_bills',label: 'BONCHON',  icon: '🔴', desc: 'Xoá tất cả đơn BONCHON đã được thanh toán.' },
         { col: 'boss_debts',   label: 'Sếp Nợ',  icon: '💰', desc: 'Xoá tất cả khoản nợ sếp đã được thanh toán.' },
       ].map((item) => (
         <div key={item.col} className="card" style={{ marginBottom: 12 }}>

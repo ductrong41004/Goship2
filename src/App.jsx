@@ -4,18 +4,11 @@ import NavBar from './components/NavBar'
 import Login from './pages/Login'
 import EmployeeHome from './pages/EmployeeHome'
 import AdminDashboard from './pages/AdminDashboard'
-import AdminEmployees from './pages/AdminEmployees'
-import AdminEmployeeDetail from './pages/AdminEmployeeDetail'
 import AdminSettings from './pages/AdminSettings'
-import AdminTodayBills from './pages/AdminTodayBills'
 import AdminCommission from './pages/AdminCommission'
 import AdminCommissionEnter from './pages/AdminCommissionEnter'
 import AdminCommissionHistory from './pages/AdminCommissionHistory'
 import AdminBossDebts from './pages/AdminBossDebts'
-import AdminWeekBills from './pages/AdminWeekBills'
-import AdminBonchonWeekBills from './pages/AdminBonchonWeekBills'
-import AdminBonchonEmployees from './pages/AdminBonchonEmployees'
-import AdminBonchonEmployeeDetail from './pages/AdminBonchonEmployeeDetail'
 import AdminFeatureSettings from './pages/AdminFeatureSettings'
 import AdminEmployeeDeposits from './pages/AdminEmployeeDeposits'
 import RulesPage from './pages/RulesPage'
@@ -66,13 +59,6 @@ function AppRoutes() {
         {isAdmin ? (
           <Routes>
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/today-bills" element={<AdminTodayBills />} />
-            <Route path="/admin/week-bills" element={<AdminWeekBills />} />
-            <Route path="/admin/employees" element={<AdminEmployees />} />
-            <Route path="/admin/employees/:uid" element={<AdminEmployeeDetail />} />
-            <Route path="/admin/bonchon/week-bills" element={<AdminBonchonWeekBills />} />
-            <Route path="/admin/bonchon/employees" element={<AdminBonchonEmployees />} />
-            <Route path="/admin/bonchon/employees/:uid" element={<AdminBonchonEmployeeDetail />} />
             <Route path="/admin/commission" element={<AdminCommission />} />
             <Route path="/admin/commission/enter" element={<AdminCommissionEnter />} />
             <Route path="/admin/commission/history" element={<AdminCommissionHistory />} />

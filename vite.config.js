@@ -14,9 +14,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
-        name: 'Quản Lý Bill Lottee',
-        short_name: 'Bill Lottee',
-        description: 'Ứng dụng quản lý bill giao hàng Lottee cho shipper',
+        name: 'GoShip Rạch Giá',
+        short_name: 'GoShip RG',
+        description: 'Ứng dụng quản lý GoShip Rạch Giá cho shipper',
         theme_color: '#0f3d3e',
         background_color: '#f5f2ec',
         display: 'standalone',
